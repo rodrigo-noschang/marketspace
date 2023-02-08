@@ -8,7 +8,7 @@
 - [ ] - Async Storage;
 - [ ] - React Native Reanimated Carousel;
 - [ ] - Image Picker;
-- [ ] - File System;
+- [x] - File System;
 - [x] - Expo Google Fonts;
 - [x] - Axios;
 - [x] - react hook form + yup

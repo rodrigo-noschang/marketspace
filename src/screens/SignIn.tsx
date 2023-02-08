@@ -1,7 +1,14 @@
-import { VStack, Image, Center, Text, Heading, ScrollView } from "native-base";
+import { useState } from "react";
+import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from "native-base";
 import { useNavigation } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 import { AuthRoutesNavigatorProps } from "@routes/auth.routes";
+
+import { AppError } from "@utils/AppError";
+import api from "@services/api";
 
 import Logo from '@assets/Logo.png';
 import Marketspace from '@assets/marketspace.png';
@@ -9,15 +16,47 @@ import Marketspace from '@assets/marketspace.png';
 import Input from "@components/Input";
 import Button from "@components/Button";
 
+type FormInputProps = {
+    email: string,
+    password: string
+}
+
+const formSchema = yup.object({
+    email: yup.string().required('Informe o e-mail').email('Formato de e-mail inválido'),
+    password: yup.string().required('Informe a senha')
+})
+
 const SignIn = () => {
+    const [loading, setLoading] = useState(false);
+
+    const { control, handleSubmit, formState: {errors} } = useForm<FormInputProps>({
+        resolver: yupResolver(formSchema)
+    });
+
     const navigator = useNavigation<AuthRoutesNavigatorProps>();
+    const toast = useToast();
 
     const handleRedirectToSignUp = () => {
         navigator.navigate('signUp');
     }
 
-    const handleLogin = () => {
-        console.log('SignIn -> Implementar LOGIN')
+    const handleLogin = async (data: FormInputProps) => {
+        try {
+            setLoading(true);
+            const response = await api.post('/sessions', data)
+            console.log('Deu certo -> ', response.data);
+
+        } catch (error) {
+            const title = error instanceof AppError ? error.message : 'Não foi possível fazer login, tente novamente mais tarde';
+            toast.show({
+                title,
+                bgColor: 'red.100',
+                placement: 'top'
+            })
+
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -43,15 +82,48 @@ const SignIn = () => {
                         Acesse sua conta
                     </Heading>
 
-                    <Input mt = {4} placeholder = "E-mail" />
-                    <Input mt = {4} placeholder = "Senha" isSecure/>
+                    <Controller 
+                        control = {control}
+                        name = 'email'
+                        render = {({field: {onChange, value}}) => (
+                            <Input 
+                                mt = {4} 
+                                placeholder = "E-mail" 
+                                onChangeText = {onChange}
+                                value = {value}
+                                keyboardType = 'email-address'
+                                autoCapitalize = "none"
+                                errorMessage = {errors.email?.message}
+                            />
+
+                        )}
+                    />
+
+                    <Controller 
+                        control = {control}
+                        name = 'password'
+                        render = {({ field: {onChange, value} }) => (
+                            <Input mt = {4} 
+                                placeholder = "Senha" 
+                                isSecure
+                                onChangeText = {onChange}
+                                value = {value}
+                                onSubmitEditing = {handleSubmit(handleLogin)}
+                                returnKeyType = 'send'
+                                errorMessage = {errors.password?.message}
+                            />
+                        )}
+                    
+                    />
+
 
                     <Button 
                         title = 'Entrar'
                         buttonTheme = 'blue'
                         w = '100%'
                         mt = {8}
-                        onPress = {handleLogin}
+                        onPress = {handleSubmit(handleLogin)}
+                        isLoading = {loading}
                     />
                 </Center>
 
