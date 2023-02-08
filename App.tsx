@@ -5,13 +5,15 @@ import { useFonts, Karla_400Regular, Karla_700Bold } from '@expo-google-fonts/ka
 import { THEME } from './src/theme';
 import Loading from '@components/Loading';
 
+import Home from '@screens/Home';
+
 export default function App() {
 	const [fontsLoaded] = useFonts({Karla_400Regular, Karla_700Bold});
 
 	return (
 		<NativeBaseProvider theme = {THEME}>
 			{ fontsLoaded ? 
-				<Header /> : <Loading />
+				<Home /> : <Loading />
 			}
 		</NativeBaseProvider>
 	);
