@@ -1,4 +1,7 @@
 import { VStack, Image, Center, Text, Heading, ScrollView } from "native-base";
+import { useNavigation } from '@react-navigation/native';
+
+import { AuthRoutesNavigatorProps } from "@routes/auth.routes";
 
 import Logo from '@assets/Logo.png';
 import Marketspace from '@assets/marketspace.png';
@@ -6,15 +9,20 @@ import Marketspace from '@assets/marketspace.png';
 import Input from "@components/Input";
 import Button from "@components/Button";
 
-const Home = () => {
+const SignIn = () => {
+    const navigator = useNavigation<AuthRoutesNavigatorProps>();
+
+    const handleRedirectToSignUp = () => {
+        navigator.navigate('signUp');
+    }
 
     const handleLogin = () => {
-        console.log('HOME -> Implementar LOGIN')
+        console.log('SignIn -> Implementar LOGIN')
     }
 
     return (
         <VStack flex = {1}>
-            <ScrollView flex = {1} >
+            <ScrollView flex = {1} showsVerticalScrollIndicator = {false}>
                 <Center bgColor = 'gray.600' py = {20} px = {10} borderBottomLeftRadius = {20} borderBottomRightRadius = {20}>
                     <Image 
                         source = {Logo}
@@ -31,12 +39,12 @@ const Home = () => {
                         Seu espaço de compra e venda
                     </Text>
 
-                    <Heading mt = {20} fontSize = 'md' fontFamily = 'heading'>
+                    <Heading mt = {20} mb = {2} fontSize = 'md' fontFamily = 'heading'>
                         Acesse sua conta
                     </Heading>
 
-                    <Input placeholder = "E-mail" />
-                    <Input placeholder = "Senha" isSecure/>
+                    <Input mt = {4} placeholder = "E-mail" />
+                    <Input mt = {4} placeholder = "Senha" isSecure/>
 
                     <Button 
                         title = 'Entrar'
@@ -48,7 +56,7 @@ const Home = () => {
                 </Center>
 
                 <Center px = {10}>
-                    <Heading mt = {12} fontSize = 'sm' fontFamily = 'body' color = 'gray.400'>
+                    <Heading mt = {12} fontSize = 'md' fontFamily = 'heading' color = 'gray.400'>
                         Ainda não tem acesso?
                     </Heading>
 
@@ -57,6 +65,7 @@ const Home = () => {
                         buttonTheme = 'light'
                         w = '100%'
                         mt = {5}
+                        onPress = {handleRedirectToSignUp}
                     />
                 </Center>
             </ScrollView>
@@ -66,4 +75,4 @@ const Home = () => {
 
 }
 
-export default Home;
+export default SignIn;

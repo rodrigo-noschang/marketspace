@@ -1,12 +1,16 @@
 # Dependencies:
 - [x] - Native base
-- [ ] - SVG Manager;
+- *[ ] - SVG Manager;
 - [x] - Babel Plugin Module Resolver;
-- [ ] - React Navigation;
-- [ ] - Stack Navigation;
-- [ ] - Tab Navigation;
+- [x] - React Navigation;
+- [x] - Stack Navigation;
+- [x] - Tab Navigation;
 - [ ] - Async Storage;
 - [ ] - React Native Reanimated Carousel;
 - [ ] - Image Picker;
 - [ ] - File System;
-- [ ] - Expo Google Fonts
+- [x] - Expo Google Fonts;
+- [x] - Axios;
+- [x] - react hook form + yup
+
+* => Talvez não seja necessário
