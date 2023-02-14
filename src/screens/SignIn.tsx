@@ -42,11 +42,11 @@ const SignIn = () => {
         navigator.navigate('signUp');
     }
 
-    const handleLogin = async (data: FormInputProps) => {
+    const handleSignIn = async (data: FormInputProps) => {
         try {
             setLoading(true);
             await signIn(data.email, data.password);
-
+            // navigator.navigate('app', {screen: 'home'})
         } catch (error) {
             const title = error instanceof AppError ? error.message : 'Não foi possível fazer login, tente novamente mais tarde';
             toast.show({
@@ -109,7 +109,7 @@ const SignIn = () => {
                                 isSecure
                                 onChangeText = {onChange}
                                 value = {value}
-                                onSubmitEditing = {handleSubmit(handleLogin)}
+                                onSubmitEditing = {handleSubmit(handleSignIn)}
                                 returnKeyType = 'send'
                                 errorMessage = {errors.password?.message}
                             />
@@ -123,7 +123,7 @@ const SignIn = () => {
                         buttonTheme = 'blue'
                         w = '100%'
                         mt = {8}
-                        onPress = {handleSubmit(handleLogin)}
+                        onPress = {handleSubmit(handleSignIn)}
                         isLoading = {loading}
                     />
                 </Center>

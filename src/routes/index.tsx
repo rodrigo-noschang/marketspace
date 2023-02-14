@@ -8,12 +8,12 @@ import { useAuth } from "@contexts/authContext";
 
 const Routes = () => {
     const { user } = useAuth();
+    console.log(user.id)
 
     return (
         <Box flex = {1} bgColor = 'gray.600'>
             <NavigationContainer>
-
-                {user.id ? <AuthRoutes /> : <AppRoutes />}
+                { user.id ? <AppRoutes /> : <AuthRoutes /> }
                 
             </NavigationContainer>
         </Box>

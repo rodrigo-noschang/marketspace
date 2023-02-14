@@ -7,8 +7,10 @@ import { authStorageStoreToken } from '@storage/authStorage';
 
 type AuthContextDataProps = {
     user: UserDTO,
+    token: string,
+    setUser: (userData: UserDTO) => void,
     signIn: (inputEmail: string, inputPassword: string) => Promise<void>,
-    token: string
+    getUserDataToCheckTokenValidity: () => Promise<string>
 }
 
 type AuthContextProviderProps = {
@@ -44,6 +46,15 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         await authStorageStoreToken(token);
     }
 
+    const getUserDataToCheckTokenValidity = async () => {
+        try {
+            const response = await api.get('/users/me');
+            return response.data.token;
+        } catch (error) {
+            throw error
+        }
+    }
+
 
     const signIn = async (inputEmail: string, inputPassword: string) => {
         const data = {email: inputEmail, password: inputPassword};
@@ -65,8 +76,10 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     return (
         <AuthContext.Provider value = {{
             user, 
+            token,
+            setUser,
             signIn,
-            token
+            getUserDataToCheckTokenValidity,
         }}>
             { children }
         </AuthContext.Provider>
