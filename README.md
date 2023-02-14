@@ -7,7 +7,7 @@
 - [x] - Tab Navigation;
 - [ ] - Async Storage;
 - [ ] - React Native Reanimated Carousel;
-- [ ] - Image Picker;
+- [x] - Image Picker;
 - [x] - File System;
 - [x] - Expo Google Fonts;
 - [x] - Axios;

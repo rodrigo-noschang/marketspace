@@ -6,14 +6,19 @@ import Loading from '@components/Loading';
 
 import Routes from '@routes/index';
 
+import { AuthContextProvider } from '@contexts/authContext';
+
 export default function App() {
 	const [fontsLoaded] = useFonts({Karla_400Regular, Karla_700Bold});
 
 	return (
 		<NativeBaseProvider theme = {THEME}>
-			{ fontsLoaded ? 
-				<Routes /> : <Loading />
-			}
+
+			<AuthContextProvider>
+				{ fontsLoaded ? 
+					<Routes /> : <Loading />
+				}
+			</AuthContextProvider>
 		</NativeBaseProvider>
 	);
 }

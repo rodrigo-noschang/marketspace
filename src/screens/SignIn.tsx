@@ -8,13 +8,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { AuthRoutesNavigatorProps } from "@routes/auth.routes";
 
 import { AppError } from "@utils/AppError";
-import api from "@services/api";
 
 import Logo from '@assets/Logo.png';
 import Marketspace from '@assets/marketspace.png';
 
 import Input from "@components/Input";
 import Button from "@components/Button";
+
+import { useAuth } from "@contexts/authContext";
 
 type FormInputProps = {
     email: string,
@@ -28,6 +29,7 @@ const formSchema = yup.object({
 
 const SignIn = () => {
     const [loading, setLoading] = useState(false);
+    const { signIn } = useAuth();
 
     const { control, handleSubmit, formState: {errors} } = useForm<FormInputProps>({
         resolver: yupResolver(formSchema)
@@ -43,8 +45,7 @@ const SignIn = () => {
     const handleLogin = async (data: FormInputProps) => {
         try {
             setLoading(true);
-            const response = await api.post('/sessions', data)
-            console.log('Deu certo -> ', response.data);
+            await signIn(data.email, data.password);
 
         } catch (error) {
             const title = error instanceof AppError ? error.message : 'Não foi possível fazer login, tente novamente mais tarde';
