@@ -9,10 +9,10 @@ import { UserDTO } from "@dtos/UserDTO";
 
 const SignOut = () => {
     // const navigator = useNavigation<AuthRoutesNavigatorProps>();
-    const { setUser } = useAuth();
+    const { signOutAndClearStorage } = useAuth();
 
     useEffect(() => {
-        setUser({} as UserDTO);
+        signOutAndClearStorage();
     }, [])
 
     return (

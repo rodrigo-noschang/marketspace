@@ -1,16 +1,24 @@
-import { ReactNode, createContext, useContext, useState } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import { UserDTO } from '@dtos/UserDTO';
 import api from '@services/api';
-import { userStorageStoreUser } from '@storage/userStorage';
-import { authStorageStoreToken } from '@storage/authStorage';
+import { UserDTO } from '@dtos/UserDTO';
+import { userStorageClearUser, userStorageGetUser, userStorageStoreUser } from '@storage/userStorage';
+import { authStorageClearToken, authStorageGetToken, authStorageStoreToken } from '@storage/authStorage';
 
 type AuthContextDataProps = {
     user: UserDTO,
     token: string,
+    loadingData: boolean,
+    isTokenValid: boolean,
+
     setUser: (userData: UserDTO) => void,
+    setToken: (newToken: string) => void,
+    setLoadingData: (loadingState: boolean) => void,
+    setIsTokenValid: (validState: boolean) => void,
+
     signIn: (inputEmail: string, inputPassword: string) => Promise<void>,
-    getUserDataToCheckTokenValidity: () => Promise<string>
+    checkTokenValidity: () => Promise<void>,
+    signOutAndClearStorage: () => void,
 }
 
 type AuthContextProviderProps = {
@@ -22,6 +30,8 @@ const AuthContext = createContext<AuthContextDataProps>({} as AuthContextDataPro
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     const [user, setUser] = useState({} as UserDTO);
     const [token, setToken] = useState('');
+    const [isTokenValid, setIsTokenValid] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
 
     const getUserDataFromApiResponse = (userResponseData: any) => {
         const { id, avatar, name, email, tel } = userResponseData;
@@ -46,12 +56,17 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         await authStorageStoreToken(token);
     }
 
-    const getUserDataToCheckTokenValidity = async () => {
+    const checkTokenValidity = async () => {
+
         try {
             const response = await api.get('/users/me');
-            return response.data.token;
+
+            if (response.data.id) {
+                setIsTokenValid(true);
+            }
         } catch (error) {
-            throw error
+            setIsTokenValid(false);
+            throw error;
         }
     }
 
@@ -63,6 +78,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
             const response = await api.post('/sessions', data);
 
             setTokenToRequestHeader(response.data.token);
+            setIsTokenValid(true);
             
             const userData = getUserDataFromApiResponse(response.data.user);
             updateAndStoreUser(userData);
@@ -73,13 +89,54 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         }
     }
 
+    const signOutAndClearStorage = async () => {
+        setUser({} as UserDTO);
+        setToken('');
+        setIsTokenValid(false);
+
+        await userStorageClearUser();
+        await authStorageClearToken();
+    }
+
+    const getStoredUserAndToken = async () => {
+        try {
+            const storedUser = await userStorageGetUser();
+            const storedToken = await authStorageGetToken();
+
+            if (storedToken) {
+                setTokenToRequestHeader(storedToken);
+            }
+
+            await checkTokenValidity();
+            
+            setUser(storedUser);
+            setToken(storedToken);
+        } catch (error) {
+            signOutAndClearStorage();
+        } finally {
+            setLoadingData(false);
+        }
+    }
+
+    useEffect(() => {
+        setLoadingData(true);
+        setIsTokenValid(false);
+        getStoredUserAndToken();
+    }, [])
+
     return (
         <AuthContext.Provider value = {{
             user, 
             token,
+            loadingData,
+            isTokenValid,
             setUser,
+            setToken,
+            setLoadingData,
+            setIsTokenValid,
             signIn,
-            getUserDataToCheckTokenValidity,
+            checkTokenValidity,
+            signOutAndClearStorage
         }}>
             { children }
         </AuthContext.Provider>

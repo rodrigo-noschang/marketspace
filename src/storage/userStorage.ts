@@ -10,3 +10,25 @@ export const userStorageStoreUser = async (userData: UserDTO) => {
         throw error
     }
 }
+
+export const userStorageGetUser = async () => {
+    try {
+        const userData = await AsyncStorage.getItem(USER_COLLECTION);
+
+        if (userData) {
+            return JSON.parse(userData);
+        } else {
+            return {} as UserDTO
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const userStorageClearUser = async () => {
+    try {
+        AsyncStorage.removeItem(USER_COLLECTION);
+    } catch (error) {
+        throw error
+    }
+}

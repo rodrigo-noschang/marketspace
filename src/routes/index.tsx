@@ -6,14 +6,20 @@ import AppRoutes from "./app.routes";
 
 import { useAuth } from "@contexts/authContext";
 
+import Loading from "@components/Loading";
+
 const Routes = () => {
-    const { user } = useAuth();
-    console.log(user.id)
+    const { isTokenValid, loadingData } = useAuth();
+
+    if (loadingData) {
+        return <Loading />
+    }
 
     return (
         <Box flex = {1} bgColor = 'gray.600'>
             <NavigationContainer>
-                { user.id ? <AppRoutes /> : <AuthRoutes /> }
+
+                { isTokenValid ? <AppRoutes /> : <AuthRoutes /> }
                 
             </NavigationContainer>
         </Box>

@@ -46,7 +46,6 @@ const SignIn = () => {
         try {
             setLoading(true);
             await signIn(data.email, data.password);
-            // navigator.navigate('app', {screen: 'home'})
         } catch (error) {
             const title = error instanceof AppError ? error.message : 'Não foi possível fazer login, tente novamente mais tarde';
             toast.show({

@@ -7,18 +7,19 @@ import { useAuth } from "@contexts/authContext";
 import { UserDTO } from "@dtos/UserDTO";
 
 const Home = () => {
-    const { user, token, setUser, getUserDataToCheckTokenValidity } = useAuth();
+    const { user, token, loadingData, setUser, setToken, setLoadingData, setIsTokenValid, checkTokenValidity, signOutAndClearStorage } = useAuth();
     const navigator = useNavigation<AuthRoutesNavigatorProps>();
     
-    const checkTokenValidity = async () => {
-        try {
-            const token = await getUserDataToCheckTokenValidity();
-            // console.log('Home -> ', token);
-        } catch (error) {
-            // console.log('Home -> ',  error) ;
-            navigator.navigate('signIn')
-        }
-    }
+    // const checkTokenValidity = async () => {
+
+    //     try {
+    //         const token = await getUserDataToCheckTokenValidity();
+    //         setIsTokenValid(true);
+    //     } catch (error) {
+    //         signOutAndClearStorage();
+    //         setIsTokenValid(false);
+    //     } 
+    // }
 
     useEffect(() => {
         checkTokenValidity();
