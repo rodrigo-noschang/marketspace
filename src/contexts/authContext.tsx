@@ -64,7 +64,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         const data = {email: inputEmail, password: inputPassword};
 
         try {
-            const response = await api.post('/sessions', data);
+            const response = await api.post('/sessions', data, {timeout: 5000});
 
             setTokenToRequestHeader(response.data.token);
             setIsTokenValid(true);
@@ -96,7 +96,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
             }
         } catch (error) {
             signOutAndClearStorage();
-            const title = error instanceof AppError ? error.message : 'Não foi possível autenticar a conta, faça login novamente';
+            const title = error instanceof AppError ? error.message : 'Sua sessão expirou, faça login novamente';
 
             toast.show({
                 title,

@@ -1,16 +1,45 @@
-import { useEffect } from "react";
-import { VStack, HStack, Box, Text, Image, Heading } from "native-base";
+import { useEffect, useState } from "react";
+import { VStack, Text } from "native-base";
+import { useNavigation } from '@react-navigation/native'
 
-import Button from "@components/Button";
+import HomeHeader from "@components/HomeHeader";
+import UserAddsHighlight from "@components/UserAddsHighlight";
 
 import { useAuth } from "@contexts/authContext";
-import { UserDTO } from "@dtos/UserDTO";
 import api from "@services/api";
+import { AppError } from "@utils/AppError";
+import { AppRoutesNavigatorProps } from "@routes/app.routes"; 
+
+import { userAddsStorageStoreUserAdds, userAddsStorageGetUserAdds } from "@storage/userAddsStorage";
 
 const Home = () => {
+    const [userAdds, setUserAdds] = useState(null);
+    const [userAddsError, setUserAddsError] = useState('');
     const { user, checkTokenValidity } = useAuth();
 
-    console.log(user);
+    const navigator = useNavigation<AppRoutesNavigatorProps>();
+
+    const fetchAndStoreUserAdds = async () => {
+        try {
+            const storedUserAdds = await userAddsStorageGetUserAdds();
+
+            if (!storedUserAdds) {
+                const response = await api.get('/users/products');
+                setUserAdds(response.data);
+        
+                await userAddsStorageStoreUserAdds(response.data);
+            }
+
+            setUserAdds(storedUserAdds);
+        } catch (error) {
+            const title = error instanceof AppError ? error.message : 'Não foi possível carregar seus anúncios. Tente novamente mais tarde';
+            setUserAddsError(title);
+        }
+    }
+
+    const handleRedirectToMyAdds = () => {
+        navigator.navigate('myAdds');
+    }
 
     useEffect(() => {
         checkTokenValidity();
@@ -18,33 +47,18 @@ const Home = () => {
 
     return (
         <VStack pt = {50} px = {6}>
-            <HStack justifyContent = 'space-between' alignItems = 'center'>
-                <HStack>
-                    { user.avatar &&
-                        <Image 
-                            source = {{uri: `${api.defaults.baseURL}/avatar/${user.avatar}`}}
-                            alt = 'User profile image'
-                            rounded = 'full'
-                        />
-                    }
-                    <VStack ml = {2}>
-                        <Text fontSize = 'md' fontFamily = 'body' color = 'gray.200'> 
-                            Boas vindas, 
-                        </Text>
-                        <Heading fontSize = 'lg' color = 'gray.200' mt = {1}> 
-                            {user.name}! 
-                        </Heading>
-                    </VStack>
-                </HStack>
+            <HomeHeader  avatar = {user.avatar} name = {user.name}/>
 
-                <Button
-                    title = 'Criar anúncio'
-                    buttonTheme = 'dark'
-                    iconName = 'plus'
-                    iconSize = {4}
-                />
-            </HStack>
+            <Text fontSize = 'md' fontFamily = 'body' color = 'gray.400' mt = {8}>
+                Seus produtos anunciados para venda
+            </Text>
 
+            <UserAddsHighlight 
+                fetchAndStoreUserAdds = {fetchAndStoreUserAdds}
+                userAdds = {userAdds}
+                error = {userAddsError}
+                onPress = {handleRedirectToMyAdds}
+            />
             
         </VStack>
     )

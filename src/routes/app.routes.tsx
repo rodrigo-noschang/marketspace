@@ -4,6 +4,7 @@ import { Octicons } from '@expo/vector-icons';
 
 import Home from "@screens/Home";
 import SignOut from "@screens/SignOut";
+import UserAdds from "@screens/UserAdds";
 
 type AppRoutes = {
     home: undefined,
@@ -45,7 +46,7 @@ const AppRoutes = () => {
 
             <Screen 
                 name = 'myAdds'
-                component = {Home}
+                component = {UserAdds}
                 options = {{
                     tabBarIcon: ({ color }) => (
                         <Icon 

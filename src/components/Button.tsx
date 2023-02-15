@@ -47,7 +47,7 @@ const Button = ({ title, buttonTheme, iconName, iconSize = 4, isLoading, ...rest
 
                 { isLoading &&
                     <Spinner 
-                        size = {iconSize}
+                        size = {14}
                         color = {buttonTheme === 'dark' || buttonTheme === 'blue' ? 'gray.700' : 'gray.100'}
                         ml = {3}
                     />
