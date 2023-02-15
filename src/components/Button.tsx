@@ -7,10 +7,11 @@ type Props = IPressableProps & {
     title: string,
     buttonTheme: ButtonThemes,
     isLoading?: boolean,
-    iconName?: keyof typeof AntDesign.glyphMap
+    iconName?: keyof typeof AntDesign.glyphMap,
+    iconSize?: number
 }
 
-const Button = ({ title, buttonTheme, iconName, isLoading, ...rest }: Props) => {
+const Button = ({ title, buttonTheme, iconName, iconSize = 4, isLoading, ...rest }: Props) => {
     return (
         <NativeBaseButton
             bgColor = {buttonTheme === 'blue' ? 'blue.200' : buttonTheme === 'dark' ? 'gray.100' : 'gray.500'}
@@ -29,7 +30,7 @@ const Button = ({ title, buttonTheme, iconName, isLoading, ...rest }: Props) => 
                 { iconName &&
                     <Icon 
                         as = {AntDesign}
-                        size = {10}
+                        size = {iconSize}
                         color = {buttonTheme === 'dark' || buttonTheme === 'blue' ? 'gray.700' : 'gray.100'}
                         name = {iconName}
                         mr = {3}
@@ -46,7 +47,7 @@ const Button = ({ title, buttonTheme, iconName, isLoading, ...rest }: Props) => 
 
                 { isLoading &&
                     <Spinner 
-                        size = {14}
+                        size = {iconSize}
                         color = {buttonTheme === 'dark' || buttonTheme === 'blue' ? 'gray.700' : 'gray.100'}
                         ml = {3}
                     />

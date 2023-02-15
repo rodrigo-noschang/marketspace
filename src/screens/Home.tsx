@@ -1,34 +1,52 @@
 import { useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
-import { Text } from "native-base";
+import { VStack, HStack, Box, Text, Image, Heading } from "native-base";
 
-import { AuthRoutesNavigatorProps } from '@routes/auth.routes';
+import Button from "@components/Button";
+
 import { useAuth } from "@contexts/authContext";
 import { UserDTO } from "@dtos/UserDTO";
+import api from "@services/api";
 
 const Home = () => {
-    const { user, token, loadingData, setUser, setToken, setLoadingData, setIsTokenValid, checkTokenValidity, signOutAndClearStorage } = useAuth();
-    const navigator = useNavigation<AuthRoutesNavigatorProps>();
-    
-    // const checkTokenValidity = async () => {
+    const { user, checkTokenValidity } = useAuth();
 
-    //     try {
-    //         const token = await getUserDataToCheckTokenValidity();
-    //         setIsTokenValid(true);
-    //     } catch (error) {
-    //         signOutAndClearStorage();
-    //         setIsTokenValid(false);
-    //     } 
-    // }
+    console.log(user);
 
     useEffect(() => {
         checkTokenValidity();
     }, [])
 
     return (
-        <Text pt = {30}>
-            Hello people
-        </Text>
+        <VStack pt = {50} px = {6}>
+            <HStack justifyContent = 'space-between' alignItems = 'center'>
+                <HStack>
+                    { user.avatar &&
+                        <Image 
+                            source = {{uri: `${api.defaults.baseURL}/avatar/${user.avatar}`}}
+                            alt = 'User profile image'
+                            rounded = 'full'
+                        />
+                    }
+                    <VStack ml = {2}>
+                        <Text fontSize = 'md' fontFamily = 'body' color = 'gray.200'> 
+                            Boas vindas, 
+                        </Text>
+                        <Heading fontSize = 'lg' color = 'gray.200' mt = {1}> 
+                            {user.name}! 
+                        </Heading>
+                    </VStack>
+                </HStack>
+
+                <Button
+                    title = 'Criar anúncio'
+                    buttonTheme = 'dark'
+                    iconName = 'plus'
+                    iconSize = {4}
+                />
+            </HStack>
+
+            
+        </VStack>
     )
 }
 

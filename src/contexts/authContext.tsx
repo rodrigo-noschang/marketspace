@@ -1,9 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { useToast } from 'native-base';
 
 import api from '@services/api';
 import { UserDTO } from '@dtos/UserDTO';
 import { userStorageClearUser, userStorageGetUser, userStorageStoreUser } from '@storage/userStorage';
 import { authStorageClearToken, authStorageGetToken, authStorageStoreToken } from '@storage/authStorage';
+import { AppError } from '@utils/AppError';
 
 type AuthContextDataProps = {
     user: UserDTO,
@@ -33,6 +35,8 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     const [isTokenValid, setIsTokenValid] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
+    const toast = useToast();
+
     const getUserDataFromApiResponse = (userResponseData: any) => {
         const { id, avatar, name, email, tel } = userResponseData;
         const userData = { id, avatar, name, email, tel };
@@ -55,21 +59,6 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
         await authStorageStoreToken(token);
     }
-
-    const checkTokenValidity = async () => {
-
-        try {
-            const response = await api.get('/users/me');
-
-            if (response.data.id) {
-                setIsTokenValid(true);
-            }
-        } catch (error) {
-            setIsTokenValid(false);
-            throw error;
-        }
-    }
-
 
     const signIn = async (inputEmail: string, inputPassword: string) => {
         const data = {email: inputEmail, password: inputPassword};
@@ -96,6 +85,25 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
         await userStorageClearUser();
         await authStorageClearToken();
+    }
+
+    const checkTokenValidity = async () => {
+        try {
+            const response = await api.get('/users/me', {timeout: 5000});
+
+            if (response.data.id) {
+                setIsTokenValid(true);
+            }
+        } catch (error) {
+            signOutAndClearStorage();
+            const title = error instanceof AppError ? error.message : 'Não foi possível autenticar a conta, faça login novamente';
+
+            toast.show({
+                title,
+                placement: 'top',
+                bgColor: 'red.100'
+            })
+        }
     }
 
     const getStoredUserAndToken = async () => {

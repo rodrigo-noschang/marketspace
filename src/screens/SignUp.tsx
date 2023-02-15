@@ -75,7 +75,7 @@ const SignUp = () => {
         }
     }
 
-    const handleCreateAccount = async ({ name, email, tel, password, confirmPassword }: FormInputProps) => {
+    const handleCreateAccount = async ({ name, email, tel, password }: FormInputProps) => {
         if (!photoFile) {
             return Alert.alert('Selecione uma imagem de perfil', 'Não será possível selecionar uma imagem depois!');
         }
@@ -84,7 +84,7 @@ const SignUp = () => {
 
         const fileExtension = photoFile.type.split('/')[1];
         const inFormPhotoFile = {
-            name: `${name}.${fileExtension}`,
+            name: `${name}.${fileExtension}`.toLowerCase(),
             ...photoFile
         }
 
@@ -97,12 +97,11 @@ const SignUp = () => {
         createUserForm.append('password', password);
 
         try {
-            const response = await api.post('/users', createUserForm, {
+            await api.post('/users', createUserForm, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            console.log('Deu certo -> ', response.data);
 
             navigator.navigate('signIn');
         } catch (error: any) {
