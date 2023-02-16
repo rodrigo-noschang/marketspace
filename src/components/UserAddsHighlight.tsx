@@ -1,15 +1,13 @@
 import { useEffect } from 'react';
 import { HStack, VStack, Box, Text, Icon, Heading, Pressable, IPressableProps, Skeleton } from 'native-base';
 import { Octicons } from '@expo/vector-icons';
-import { ProductsDTO } from '@dtos/ProductsDTO';
 
-type Props = IPressableProps & {
-    fetchAndStoreUserAdds: () => Promise<void>
-    userAdds: ProductsDTO[] | null
-    error: string
-}
+import { useUserAdds } from '@contexts/userAddsContext';
 
-const UserAddsHighlight = ({ fetchAndStoreUserAdds, userAdds, error, ...rest }: Props) => {
+type Props = IPressableProps & {}
+
+const UserAddsHighlight = ({ ...rest }: Props) => {
+    const { userAdds, fetchAndStoreUserAdds, userAddsError } = useUserAdds();
     const loadingAdds = !userAdds;
 
     useEffect(() => {
@@ -28,10 +26,10 @@ const UserAddsHighlight = ({ fetchAndStoreUserAdds, userAdds, error, ...rest }: 
                 mt = {3}
             />
         :
-            error ? 
+            userAddsError ? 
                 <Box w = '100%' h = {60} bgColor = 'blue.300' rounded = 'md' p = {4} alignItems = 'center' mt = {3}>
                     <Text fontSize = 'md' fontFamily = 'body' color = 'red.100'>
-                        {error}
+                        {userAddsError}
                     </Text>
                 </Box>
             :
