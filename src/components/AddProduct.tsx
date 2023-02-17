@@ -11,6 +11,24 @@ const AddProduct = ({ product, ...rest }: Props) => {
 
     return (
         <Pressable w = '47%' {...rest} mt = {5}>
+            <Badge 
+                position = 'absolute' 
+                zIndex = {1} 
+                alignSelf = 'flex-end' 
+                bgColor = {product.is_new ? 'blue.100' : 'gray.200'} 
+                rounded = 'full'
+                px = {2}
+                py = {0}
+                mt = {1}
+                right = {1}
+                _text={{
+                    color: 'gray.600',
+                    fontSize: 'xs'
+                }}
+            >
+                {product.is_new ? 'NOVO' : 'USADO'}
+            </Badge>
+
             <VStack>
                 <Image 
                     h = {24}
@@ -21,12 +39,12 @@ const AddProduct = ({ product, ...rest }: Props) => {
                     borderColor = 'gray.200'
                 />
 
-                <Text fontSize = 'md' fontFamily = 'body' color = 'gray.300' mt = {1}>
+                <Text fontSize = 'md' fontFamily = 'body' color = {product.is_active ? 'gray.300' : 'gray.500'} mt = {1}>
                     {product.name}
                 </Text>
 
                 <HStack alignItems = 'flex-end'>
-                    <Heading fontFamily = 'heading' fontSize = 'sm' color = 'gray.300'>
+                    <Heading fontFamily = 'heading' fontSize = 'sm'  color = {product.is_active ? 'gray.300' : 'gray.500'}>
                         R$   
                     </Heading>
 

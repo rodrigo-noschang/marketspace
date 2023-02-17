@@ -1,0 +1,51 @@
+import { HStack, Icon, Heading, Pressable, Box } from "native-base";
+import { Octicons, AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'
+
+type Props = {
+    title: string
+    returnable?: boolean
+    action?: () => void
+    actionIcon?: 'plus' | 'edit'
+}
+
+const AppHeader = ({ title, returnable = false, action, actionIcon }: Props) => {
+    const navigator = useNavigation()
+
+    const handleReturnScreen = () => {
+        navigator.goBack();
+    }
+
+    return (
+        <HStack  mt = {2} mb = {4} alignItems = 'center' position = 'relative'>
+            { returnable &&
+                <Pressable onPress = {handleReturnScreen}>
+                    <Icon 
+                        as = {Octicons}
+                        name = 'arrow-left'
+                        size = {6}
+                        color = 'gray.400'
+                    />
+                </Pressable>
+            }
+
+            <Heading fontFamily = 'heading' fontSize = 'lg' color = 'gray.200' textAlign = 'center' flex = {1}>
+                {title}
+            </Heading>
+
+            { action && actionIcon &&
+                <Pressable onPress = {action}>
+                    <Icon 
+                        as = {AntDesign}
+                        name = {actionIcon}
+                        size = {6}
+                        color = 'gray.400'
+                    />
+                </Pressable>
+            }
+        </HStack>
+    )
+
+}
+
+export default AppHeader;
