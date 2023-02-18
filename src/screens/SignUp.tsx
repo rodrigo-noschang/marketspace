@@ -71,7 +71,7 @@ const SignUp = () => {
             setUserPhoto(selectedImage.assets[0].uri);
             setPhotoFile(photoFileObject);
         } catch (error) {
-            console.log('Image Picker error -> ', error);
+            console.log('SignUp Image Picker error -> ', error);
         }
     }
 

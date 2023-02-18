@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
-import { VStack, Text, Heading, Select, HStack, CheckIcon, Icon } from "native-base";
+import { VStack, Text, Heading, Select, HStack, Icon } from "native-base";
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'
 
 import AddProduct from "@components/AddProduct";
 import AppHeader from "@components/AppHeader";
 
 import { useUserAdds } from "@contexts/userAddsContext";
+import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 
 const UserAdds = () => {
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
-    const { userAdds, fetchAndStoreUserAdds } = useUserAdds();
+    const { userAdds } = useUserAdds();
     const [shownAdds, setShownAdds] = useState(userAdds);
+
+    const navigator = useNavigation<AddsRoutesNavigationProps>();
 
     const filterUserAdds = () => {
         if (selectedAddsFilter === 'all') {
@@ -23,6 +27,10 @@ const UserAdds = () => {
             setShownAdds(selectedAdd);
         }
     }
+
+    const handleNewAddRoute = () => {
+        navigator.navigate('newAdd');
+    }
     
     useEffect(() => {
         filterUserAdds();
@@ -33,8 +41,8 @@ const UserAdds = () => {
             <AppHeader 
                 // returnable
                 title = 'Meus anúncios'
-                // action = {() => {}}
-                // actionIcon = "plus"
+                action = {handleNewAddRoute}
+                actionIcon = "plus"
             />
 
             <HStack alignItems = 'center' justifyContent = 'space-between' mt = {4}>
