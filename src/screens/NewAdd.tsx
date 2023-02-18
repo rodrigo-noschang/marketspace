@@ -8,14 +8,14 @@ import AppHeader from '@components/AppHeader';
 
 import { useAuth } from '@contexts/authContext';
 
-type photoObject = {
+type PhotoObject = {
     name: string, 
     uri: string,
     type: string
 }
 
 const NewAdd = () => {
-    const [productPhotosUri, setProductPhotosUri] = useState<photoObject[]>([]);
+    const [productPhotos, setProductPhotos] = useState<PhotoObject[]>([]);
     const { user } = useAuth();
 
     const selectImageFromGalery = async () => {
@@ -40,25 +40,49 @@ const NewAdd = () => {
         return fileObject
     }
 
-    const addProductPhoto = (productPhoto: photoObject) => {
-        setProductPhotosUri([...productPhotosUri, productPhoto])
-    }
-
     const handleAddProductImage = async () => {
         const photoObject = await selectImageFromGalery();
 
         if (!photoObject) return;
-        addProductPhoto(photoObject);
+        setProductPhotos([...productPhotos, photoObject])
     }
 
-    const changeProductImage = async () => {
+    const updateImagesState = (photoUri: string, newPhoto: PhotoObject) => {
+        const currentPhotoIndex = productPhotos.findIndex(photo => photo.uri === photoUri);
+
+        if (currentPhotoIndex === -1) return;
+
+        productPhotos.splice(currentPhotoIndex, 1, newPhoto);
+        setProductPhotos([...productPhotos]);
+    }
+
+    const changeProductImage = async (photoUri: string) => {
         const photoObject = await selectImageFromGalery();
 
         if (!photoObject) return;
+        updateImagesState(photoUri, photoObject);   
     }
 
-    const handleChangeOrDeleteProduct = async () => {
-        return Alert.alert('Deseja excluir ou trocar a imagem?');
+    const deleteProductPhoto = (photoUri: string) => {
+        const updatedPhotos = productPhotos.filter(photos => photos.uri !== photoUri);
+        setProductPhotos(updatedPhotos);
+    }
+
+    const handleChangeOrDeleteProduct = async (photoUri: string) => {
+        return Alert.alert('Deseja excluir ou trocar a imagem?', '', [
+            {
+                text: 'Cancelar',
+                onPress: () => {}
+            },
+            {
+                text: 'Trocar',
+                onPress: () => changeProductImage(photoUri)
+            },
+            {
+                text: 'Excluir',
+                onPress: () => deleteProductPhoto(photoUri)
+            }
+        ]);
     }
 
     return (
@@ -78,9 +102,9 @@ const NewAdd = () => {
 
             <HStack flexWrap = 'wrap' mt = {3}>
 
-                { productPhotosUri.length > 0 &&
-                    productPhotosUri.map(photo => (
-                        <Pressable onPress = {handleChangeOrDeleteProduct} key = {photo.uri}>
+                { productPhotos.length > 0 &&
+                    productPhotos.map(photo => (
+                        <Pressable onPress = {() => handleChangeOrDeleteProduct(photo.uri)} key = {photo.uri}>
                             <Image 
                                 w = {100}
                                 h = {100}
@@ -94,7 +118,7 @@ const NewAdd = () => {
                     ))
                 }
 
-                { productPhotosUri.length < 3 &&
+                { productPhotos.length < 3 &&
                     <Pressable bgColor = 'gray.500' w = {100} h = {100} rounded = 'md' onPress = {handleAddProductImage}>
                         <Center flex = {1}>
                             <Icon 
