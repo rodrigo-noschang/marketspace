@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
-import { VStack, Heading, Text, Pressable, Icon, Center, HStack, Image } from 'native-base';
-import { AntDesign } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import { Switch } from 'react-native';
+import { VStack, Heading, Text, ScrollView, Radio, HStack, Box } from 'native-base';
 
 import AppHeader from '@components/AppHeader';
-
-import { useAuth } from '@contexts/authContext';
+import NewAddPhotoSelector from '@components/NewAddPhotoSelector';
+import Input from '@components/Input';
 
 type PhotoObject = {
     name: string, 
@@ -15,125 +13,95 @@ type PhotoObject = {
 }
 
 const NewAdd = () => {
-    const [productPhotos, setProductPhotos] = useState<PhotoObject[]>([]);
-    const { user } = useAuth();
+    const [productsPhotos, setProductsPhotos] = useState<PhotoObject[]>([]);
+    const [productIsNew, setProductIsNew] = useState('');
+    const [acceptsTrade, setAcceptsTrade] = useState(false);
 
-    const selectImageFromGalery = async () => {
-        const selectedImage = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 4],
-            quality: 1
-        })
-
-        if (selectedImage.canceled) return;
-
-        const fileUri = selectedImage.assets[0].uri
-        const fileExtension = fileUri.split('.').pop();
-
-        const fileObject = {
-            name: `${user.name.toLowerCase()}.${fileExtension}`,
-            type: `image/${fileExtension}`,
-            uri: fileUri
-        }
-
-        return fileObject
-    }
-
-    const handleAddProductImage = async () => {
-        const photoObject = await selectImageFromGalery();
-
-        if (!photoObject) return;
-        setProductPhotos([...productPhotos, photoObject])
-    }
-
-    const updateImagesState = (photoUri: string, newPhoto: PhotoObject) => {
-        const currentPhotoIndex = productPhotos.findIndex(photo => photo.uri === photoUri);
-
-        if (currentPhotoIndex === -1) return;
-
-        productPhotos.splice(currentPhotoIndex, 1, newPhoto);
-        setProductPhotos([...productPhotos]);
-    }
-
-    const changeProductImage = async (photoUri: string) => {
-        const photoObject = await selectImageFromGalery();
-
-        if (!photoObject) return;
-        updateImagesState(photoUri, photoObject);   
-    }
-
-    const deleteProductPhoto = (photoUri: string) => {
-        const updatedPhotos = productPhotos.filter(photos => photos.uri !== photoUri);
-        setProductPhotos(updatedPhotos);
-    }
-
-    const handleChangeOrDeleteProduct = async (photoUri: string) => {
-        return Alert.alert('Deseja excluir ou trocar a imagem?', '', [
-            {
-                text: 'Cancelar',
-                onPress: () => {}
-            },
-            {
-                text: 'Trocar',
-                onPress: () => changeProductImage(photoUri)
-            },
-            {
-                text: 'Excluir',
-                onPress: () => deleteProductPhoto(photoUri)
-            }
-        ]);
-    }
+    console.log(acceptsTrade);
 
     return (
-        <VStack pt = {45} px = {6} flex = {1}>
-            <AppHeader 
-                title = 'Criar anúncio'
-                returnable
-            />
+        <ScrollView pt = {45} pb = {35} px = {6} flex = {1} showsVerticalScrollIndicator = {false}>
+            <VStack >
+                <AppHeader 
+                    title = 'Criar anúncio'
+                    returnable
+                />
 
-            <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {2}>
-                Imagens
-            </Heading>
+                <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {2}>
+                    Imagens
+                </Heading>
 
-            <Text fontSize = 'md' color = 'gray.200' fontFamily = 'body' mt = {1}>
-                Escolha até 3 imagens para mostrar o quanto o seu produto é incrível!
-            </Text>
+                <Text fontSize = 'md' color = 'gray.200' fontFamily = 'body' mt = {1}>
+                    Escolha até 3 imagens para mostrar o quanto o seu produto é incrível!
+                </Text>
 
-            <HStack flexWrap = 'wrap' mt = {3}>
+                <NewAddPhotoSelector 
+                    productsPhotos = {productsPhotos}
+                    setProductsPhotos = {setProductsPhotos}
+                />
 
-                { productPhotos.length > 0 &&
-                    productPhotos.map(photo => (
-                        <Pressable onPress = {() => handleChangeOrDeleteProduct(photo.uri)} key = {photo.uri}>
-                            <Image 
-                                w = {100}
-                                h = {100}
-                                rounded = 'md'
-                                source = {{uri: photo.uri}}
-                                alt = 'Foto do produto'
-                                mr = {3}
-                                mb = {2}
-                            />
-                        </Pressable>
-                    ))
-                }
+                <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
+                    Sobre o produto
+                </Heading>
 
-                { productPhotos.length < 3 &&
-                    <Pressable bgColor = 'gray.500' w = {100} h = {100} rounded = 'md' onPress = {handleAddProductImage}>
-                        <Center flex = {1}>
-                            <Icon 
-                                as = {AntDesign}
-                                name = 'plus'
-                                size = {6}
-                                color = 'gray.400'
-                            />
-                        </Center>
-                    </Pressable>
-                }
+                <Input
+                    mt = {3} 
+                    placeholder = 'Título do anúncio'
+                />
 
-            </HStack>
+                <Input 
+                    mt = {3}
+                    placeholder = 'Descrição do produto'
+                    h = {130}
+                    textAlignVertical = 'top'
+                    multiline
+                />
 
-        </VStack>
+                <Radio.Group
+                    colorScheme = 'indigo'
+                    name = 'productIsNew'
+                    value = {productIsNew}
+                    onChange = {(chosenValue) => {
+                        setProductIsNew(chosenValue)
+                    }}
+                >
+                    <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
+                        <Radio value = 'new' p = {0.5}>
+                            Produto novo
+                        </Radio>
+
+                        <Radio value = 'old' p = {0.5}>
+                            Produto usado
+                        </Radio>
+                    </HStack>
+
+                </Radio.Group>
+
+                <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
+                    Venda
+                </Heading>
+
+                <Input 
+                    placeholder = 'Valor do produto'
+                    preText = 'R$'
+                    mt = {2}
+                />
+
+                <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
+                    Aceita troca?
+                </Heading>
+
+                <Box alignItems = 'flex-start'>
+                    <Switch 
+                        trackColor = {{false: '#D9D8DA', true: '#D9D8DA'}}
+                        thumbColor = {acceptsTrade ? '#647AC7' : '#F7F7F8'}
+                        value = {acceptsTrade}
+                        onValueChange = {() => setAcceptsTrade(!acceptsTrade)}
+                    />
+                </Box>
+
+            </VStack>
+        </ScrollView>
     )
 
 }
