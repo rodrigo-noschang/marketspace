@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from 'react-native';
-import { VStack, Heading, Text, ScrollView, Radio, HStack, Box } from 'native-base';
+import { VStack, Heading, ScrollView, Text, Radio, HStack, Box, Checkbox } from 'native-base';
 
 import AppHeader from '@components/AppHeader';
 import NewAddPhotoSelector from '@components/NewAddPhotoSelector';
@@ -16,11 +16,12 @@ const NewAdd = () => {
     const [productsPhotos, setProductsPhotos] = useState<PhotoObject[]>([]);
     const [productIsNew, setProductIsNew] = useState('');
     const [acceptsTrade, setAcceptsTrade] = useState(false);
+    const [acceptedPaymentMethods, setAcceptedPaymentMethods] = useState<string[]>([]);
 
-    console.log(acceptsTrade);
+    console.log(acceptedPaymentMethods);
 
     return (
-        <ScrollView pt = {45} pb = {35} px = {6} flex = {1} showsVerticalScrollIndicator = {false}>
+        <ScrollView pt = {45} px = {6} flex = {1} showsVerticalScrollIndicator = {false}>
             <VStack >
                 <AppHeader 
                     title = 'Criar anúncio'
@@ -99,6 +100,34 @@ const NewAdd = () => {
                         onValueChange = {() => setAcceptsTrade(!acceptsTrade)}
                     />
                 </Box>
+
+                <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
+                    Meios de pagamento aceitos
+                </Heading>
+
+{/* // https://github.com/react-native-checkbox/react-native-checkbox */}
+                <Checkbox.Group value = {acceptedPaymentMethods} onChange = {setAcceptedPaymentMethods}>
+                    <Checkbox value = 'boleto'>
+                        Boleto
+                    </Checkbox>
+
+                    <Checkbox value = 'pix'>
+                        Pix
+                    </Checkbox>
+
+                    <Checkbox value = 'cash'>
+                        Dinheiro
+                    </Checkbox>
+
+                    <Checkbox value = 'card'>
+                        Cartão de Crédito
+                    </Checkbox>
+
+                    <Checkbox value = 'deposit'>
+                        Depósito Bancário
+                    </Checkbox>
+
+                </Checkbox.Group>
 
             </VStack>
         </ScrollView>
