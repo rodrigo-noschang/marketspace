@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Box, HStack, Text, Icon, Pressable, IPressableProps, Center } from "native-base";
 import { Feather } from '@expo/vector-icons';
 
+import { PaymentOptions } from "@dtos/AddsDTO";
+
 type Props = IPressableProps & {
-    value: string,
+    value: PaymentOptions,
     label: string,
-    options: string[],
-    updateOptions: (value: string[]) => void
+    options: PaymentOptions[],
+    updateOptions: (value: PaymentOptions[]) => void
 }
 
 const CheckBoxInput = ({ value, label, options, updateOptions, ...rest }: Props) => {

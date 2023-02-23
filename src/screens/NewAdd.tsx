@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Switch } from 'react-native';
+import { Alert, Switch } from 'react-native';
 import { VStack, Heading, ScrollView, Text, Radio, HStack, Box } from 'native-base';
 import { useNavigation } from '@react-navigation/native'
-import { useAuth } from '@contexts/authContext';
+
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 import Input from '@components/Input';
 import AppHeader from '@components/AppHeader';
@@ -10,34 +13,59 @@ import CheckBoxInput from '@components/CheckBoxInput';
 import NewAddPhotoSelector from '@components/NewAddPhotoSelector';
 import Button from '@components/Button';
 
+import { NewProductAddDTO, PaymentOptions } from '@dtos/AddsDTO';
+
 type PhotoObject = {
     name: string, 
     uri: string,
     type: string
 }
 
+type FormInputsProps = {
+    name: string, 
+    description: string,
+    price: number,
+    is_new: string
+}
+
+const formSchema = yup.object({
+    name: yup.string().required('Informe o nome do produto'),
+    description: yup.string().required('Forneça uma descrição para o produto'),
+    price: yup.number().required('Informe o preço do produto'),
+    is_new: yup.string()
+})
+
 const NewAdd = () => {
     const [productsPhotos, setProductsPhotos] = useState<PhotoObject[]>([]);
-    const [addTitle, setAddTitle] = useState('');
-    const [addDescription, setAddDescription] = useState('');
-    const [productIsNew, setProductIsNew] = useState('');
-    const [productPrice, setProductPrice] = useState('');
     const [acceptsTrade, setAcceptsTrade] = useState(false);
-    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<string[]>([]);
+    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>([]);
+
+    const { control, handleSubmit, formState: { errors } } = useForm<FormInputsProps>({
+        resolver: yupResolver(formSchema)
+    });
+
+    const handleCreateNewAddYup = (data: FormInputsProps) => {
+        data.is_new = data.is_new ? data.is_new : 'new';
+
+        if (selectedPaymentOptions.length === 0) {
+            return Alert.alert('Informe as opções de pagamento', 'Selecione ao menos uma opção de pagamento');
+        }
+
+        if (productsPhotos.length === 0) {
+            return Alert.alert('Adicione imagens do seu produto', 'Coloque até 3 imagens para dar um toque a mais no seu anúncio!');
+        }
+
+        const newAddData: NewProductAddDTO = {
+            ...data, 
+            payment_methods: selectedPaymentOptions,
+            accept_trade: acceptsTrade,
+            is_new: data.is_new === 'new'
+        }
+        
+        console.log('Dados pra request -> ', newAddData);    
+    }
 
     const navigator = useNavigation();
-    const { user } = useAuth();
-
-    const handleCreateNewAdd = () => {
-        const add = {
-            name: addTitle,
-            description: addDescription,
-            is_new: productIsNew === 'new' ? true : productIsNew === 'old' ? false : null,
-            price: productPrice,
-            user_id: user.id,
-            is_active: true
-        }
-    }
     
     return (
         <VStack flex = {1}>
@@ -67,55 +95,87 @@ const NewAdd = () => {
                         Sobre o produto
                     </Heading>
 
-                    <Input
-                        mt = {3} 
-                        placeholder = 'Título do anúncio'
-                        onChangeText = {setAddTitle}
-                        />
-
-                    <Input 
-                        mt = {3}
-                        placeholder = 'Descrição do produto'
-                        h = {130}
-                        textAlignVertical = 'top'
-                        multiline
-                        onChangeText = {setAddDescription}
+                    <Controller 
+                        control = {control}
+                        name = 'name'
+                        render = {({field: {onChange, value}}) => (
+                            <Input
+                                mt = {3} 
+                                placeholder = 'Título do anúncio'
+                                onChangeText = {onChange}
+                                value = {value}
+                                errorMessage = {errors.name?.message}
+                            />
+                        )}
+                    />
+                    
+                    <Controller 
+                        control = {control}
+                        name = 'description'
+                        render = {({ field: {onChange, value} }) => (
+                            <Input 
+                                mt = {3}
+                                placeholder = 'Descrição do produto'
+                                h = {130}
+                                textAlignVertical = 'top'
+                                multiline
+                                onChangeText = {onChange}
+                                value = {value}
+                                errorMessage = {errors.description?.message}
+                            />
+                        )}
                     />
 
-                    <Radio.Group
-                        colorScheme = 'indigo'
-                        name = 'productIsNew'
-                        value = {productIsNew}
-                        onChange = {(chosenValue) => {
-                            setProductIsNew(chosenValue)
-                        }}
-                    >
-                        <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
-                            <Radio value = 'new' p = {0.5}>
-                                <Text fontSize = 'lg' fontFamily = 'body' color = 'gray.200'>
-                                    Produto novo
-                                </Text>
-                            </Radio>
+                    <Controller 
+                        control = {control}
+                        name = 'is_new'
+                        render = {({field: {onChange, value}}) => (
+                            
+                            <Radio.Group
+                                colorScheme = 'indigo'
+                                name = 'productIsNew'
+                                value = {value || 'new'}
+                                onChange = {onChange}
+                            >
+                                <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
+                                    <Radio value = 'new' p = {0.5} >
+                                        <Text fontSize = 'lg' fontFamily = 'body' color = 'gray.200' >
+                                            Produto novo
+                                        </Text>
+                                    </Radio>
 
-                            <Radio value = 'old' p = {0.5}>
-                                <Text fontSize = 'lg' fontFamily = 'body' color = 'gray.200'>
-                                    Produto usado
-                                </Text>
-                            </Radio>
-                        </HStack>
+                                    <Radio value = 'old' p = {0.5}>
+                                        <Text fontSize = 'lg' fontFamily = 'body' color = 'gray.200'>
+                                            Produto usado
+                                        </Text>
+                                    </Radio>
+                                </HStack>
 
-                    </Radio.Group>
+                            </Radio.Group>
+                        )}
+                    />
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
                         Venda
                     </Heading>
 
-                    <Input 
-                        placeholder = 'Valor do produto'
-                        preText = 'R$'
-                        mt = {2}
-                        onChangeText = {setProductPrice}
+                    <Controller 
+                        control = {control}
+                        name = 'price'
+                        render = {({field: {onChange, value}}) => (
+                            <Input 
+                                placeholder = 'Valor do produto'
+                                preText = 'R$'
+                                keyboardType = 'numeric'
+                                mt = {2}
+                                onChangeText = {onChange}
+                                value = {value ? (value).toString() : ''}
+                                errorMessage = {errors.price?.message}
+                            />
+                        )}
                     />
+
+                   
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
                         Aceita troca?
@@ -188,7 +248,7 @@ const NewAdd = () => {
                         title = 'Avançar'
                         buttonTheme = 'dark'  
                         w = '48%'
-                        onPress = {handleCreateNewAdd} 
+                        onPress = {handleSubmit(handleCreateNewAddYup)} 
                     />
                 </HStack>
             </ScrollView>
