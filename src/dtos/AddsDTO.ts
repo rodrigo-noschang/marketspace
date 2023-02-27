@@ -11,6 +11,6 @@ export type NewProductAddDTO = {
     description: string,
     is_new: boolean,
     price: number,
-    accept_trade: boolean,
+    accept_trade: boolean
     payment_methods: PaymentOptions[]
 }

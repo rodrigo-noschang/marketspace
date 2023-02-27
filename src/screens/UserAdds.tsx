@@ -7,11 +7,17 @@ import AddProduct from "@components/AddProduct";
 import AppHeader from "@components/AppHeader";
 
 import { useUserAdds } from "@contexts/userAddsContext";
+import { useNewAdd } from "@contexts/newAddContext";
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
+import { DatabaseProductDTO } from "@dtos/ProductDTO";
+import { NewProductAddDTO } from "@dtos/AddsDTO";
+import api from "@services/api";
 
 const UserAdds = () => {
-    const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
     const { userAdds } = useUserAdds();
+    const { setNewAdd, setNewAddImages } = useNewAdd();
+
+    const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
     const [shownAdds, setShownAdds] = useState(userAdds);
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
@@ -30,6 +36,30 @@ const UserAdds = () => {
 
     const handleNewAddRoute = () => {
         navigator.navigate('newAdd');
+    }
+
+    const handleShowAdd = (add: DatabaseProductDTO) => {
+        const addData: NewProductAddDTO = {
+            name: add.name,
+            description: add.description,
+            is_new: add.is_new,
+            price: add.price,
+            accept_trade: add.accept_trade,
+            payment_methods: add.payment_methods.map(method => method.key),
+        }
+
+        const addImages = add.product_images.map(image => {
+            return {
+                name: '',
+                type: '',
+                uri: `${api.defaults.baseURL}/images/${image.path}`
+            } 
+        })
+
+        setNewAdd(addData);
+        setNewAddImages(addImages);
+
+        navigator.navigate('addPreview');
     }
     
     useEffect(() => {
@@ -82,7 +112,11 @@ const UserAdds = () => {
             <HStack flexWrap = 'wrap' justifyContent = 'space-between'>
                 {shownAdds ? 
                     shownAdds.map((add, index) => (
-                        <AddProduct product = {add} key = {`${add.id}-${index}`}/>
+                        <AddProduct 
+                            product = {add} 
+                            key = {`${add.id}-${index}`}
+                            onPress = {() => handleShowAdd(add)}
+                        />
                     ))
                 :
                     <Heading fontSize = 'lg' fontFamily = 'heading' color = 'gray.300'> Você ainda não possui anúncios </Heading>

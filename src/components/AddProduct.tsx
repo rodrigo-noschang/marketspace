@@ -1,10 +1,10 @@
 import { Pressable, IPressableProps, VStack, Image, Heading, Text, Badge, HStack } from 'native-base';
 
-import { ProductAddDTO } from '@dtos/AddsDTO';
+import { DatabaseProductDTO } from '@dtos/ProductDTO';
 import api from '@services/api';
 
 type Props = IPressableProps & {
-    product: ProductAddDTO 
+    product: DatabaseProductDTO
 }
 
 const AddProduct = ({ product, ...rest }: Props) => {
