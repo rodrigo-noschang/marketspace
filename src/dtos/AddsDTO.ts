@@ -1,5 +1,11 @@
 export type PaymentOptions = 'boleto' | 'pix' | 'cash' | 'card' | 'deposit';  
 
+export type ProductImage = {
+    name: string,
+    type: string,
+    uri: string
+}
+
 export type NewProductAddDTO = {
     name: string,
     description: string,

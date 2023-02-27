@@ -2,10 +2,12 @@ import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-na
 
 import AppRoutes from './app.routes';
 import NewAdd from '@screens/NewAdd';
+import NewAddPreview from '@screens/NewAddPreview';
 
 type AddsRoutes = {
     appHome: undefined,
-    newAdd: undefined
+    newAdd: undefined,
+    newAddPreview: undefined
 }
 
 export type AddsRoutesNavigationProps = NativeStackNavigationProp<AddsRoutes>;
@@ -25,6 +27,11 @@ const AddsRoutes = () => {
             <Screen 
                 name = 'newAdd'
                 component = {NewAdd}
+            />
+
+            <Screen 
+                name = 'newAddPreview'
+                component = {NewAddPreview}
             />
         </Navigator>
     )

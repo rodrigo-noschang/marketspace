@@ -3,15 +3,19 @@ import { Alert, Switch } from 'react-native';
 import { VStack, Heading, ScrollView, Text, Radio, HStack, Box } from 'native-base';
 import { useNavigation } from '@react-navigation/native'
 
-import { useForm, Controller } from 'react-hook-form';
+import { AddsRoutesNavigationProps } from '@routes/adds.routes';
+
 import * as yup from 'yup';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import { useNewAdd } from '@contexts/newAddContext';
+
 import Input from '@components/Input';
+import Button from '@components/Button';
 import AppHeader from '@components/AppHeader';
 import CheckBoxInput from '@components/CheckBoxInput';
 import NewAddPhotoSelector from '@components/NewAddPhotoSelector';
-import Button from '@components/Button';
 
 import { NewProductAddDTO, PaymentOptions } from '@dtos/AddsDTO';
 
@@ -44,7 +48,10 @@ const NewAdd = () => {
         resolver: yupResolver(formSchema)
     });
 
-    const handleCreateNewAddYup = (data: FormInputsProps) => {
+    const navigator = useNavigation<AddsRoutesNavigationProps>();
+    const { setNewAdd, setNewAddImages } = useNewAdd();
+
+    const handleCreateNewAdd = (data: FormInputsProps) => {
         data.is_new = data.is_new ? data.is_new : 'new';
 
         if (selectedPaymentOptions.length === 0) {
@@ -62,10 +69,10 @@ const NewAdd = () => {
             is_new: data.is_new === 'new'
         }
         
-        console.log('Dados pra request -> ', newAddData);    
+        setNewAdd(newAddData);
+        setNewAddImages(productsPhotos);
+        navigator.navigate('newAddPreview');
     }
-
-    const navigator = useNavigation();
     
     return (
         <VStack flex = {1}>
@@ -248,7 +255,7 @@ const NewAdd = () => {
                         title = 'Avançar'
                         buttonTheme = 'dark'  
                         w = '48%'
-                        onPress = {handleSubmit(handleCreateNewAddYup)} 
+                        onPress = {handleSubmit(handleCreateNewAdd)} 
                     />
                 </HStack>
             </ScrollView>
