@@ -12,7 +12,7 @@ type Props = IPressableProps & {
 }
 
 const CheckBoxInput = ({ value, label, options, updateOptions, ...rest }: Props) => {
-    const [isSelected, setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState(options.includes(value));
 
     const updatePaymentOptions = () => {
         if (!isSelected) {

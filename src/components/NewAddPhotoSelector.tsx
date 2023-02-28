@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Alert } from "react-native";
 import { HStack, Pressable, Image, Icon, Badge, Center } from "native-base"
 import { AntDesign } from '@expo/vector-icons';

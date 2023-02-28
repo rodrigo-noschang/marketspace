@@ -1,18 +1,22 @@
 import AppHeader from "@components/AppHeader";
 import { Box, VStack } from "native-base";
+import { useNavigation } from '@react-navigation/native'
 
 import ProductsInfo from "@components/ProductsInfo";
-
-import { useNewAdd } from "@contexts/newAddContext";
-import { useAuth } from "@contexts/authContext";
 import Button from "@components/Button";
 
+import { useAdd } from "@contexts/addContext";
+import { useAuth } from "@contexts/authContext";
+import { AddsRoutesNavigationProps } from "@routes/adds.routes";
+
 const AddPreview = () => {
-    const { newAdd, newAddImages } = useNewAdd();
+    const { add, addImages } = useAdd();
     const { user } = useAuth();
 
+    const navigator = useNavigation<AddsRoutesNavigationProps>();
+
     const handleEditAdd = () => {
-        console.log('IMPLEMENTAR EDIÇÃO DO ADD')
+        navigator.navigate('addEditing');
     }
 
     const handleDeactivateAdd = () => {
@@ -35,9 +39,9 @@ const AddPreview = () => {
             </Box>
 
             <ProductsInfo 
-                productData = {newAdd}
+                productData = {add}
                 productAnnouncer = {user}
-                productImages = {newAddImages}
+                productImages = {addImages}
             >
 
                 <Box mt = {4}>

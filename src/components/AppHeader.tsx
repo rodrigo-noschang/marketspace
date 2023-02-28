@@ -1,4 +1,5 @@
-import { HStack, Icon, Heading, Pressable, Box } from "native-base";
+import { Alert } from 'react-native';
+import { HStack, Icon, Heading, Pressable } from "native-base";
 import { Octicons, AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
 
@@ -6,13 +7,25 @@ type Props = {
     title: string
     returnable?: boolean
     action?: () => void
-    actionIcon?: 'plus' | 'edit'
+    actionIcon?: 'plus' | 'edit',
+    warningMessage?: string
 }
 
-const AppHeader = ({ title, returnable = false, action, actionIcon }: Props) => {
+const AppHeader = ({ title, returnable = false, action, actionIcon, warningMessage }: Props) => {
     const navigator = useNavigation()
 
     const handleReturnScreen = () => {
+        if (warningMessage) {
+            return Alert.alert('Atenção!', warningMessage, [
+            {
+                text: 'Retornar mesmo assim',
+                onPress: () => navigator.goBack()
+            },
+            {
+                text: 'Cancelar'
+            }
+            ]);
+        }
         navigator.goBack();
     }
 

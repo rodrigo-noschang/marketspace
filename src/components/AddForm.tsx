@@ -14,7 +14,7 @@ import CheckBoxInput from './CheckBoxInput';
 import Button from './Button';
 
 import { NewProductAddDTO, PaymentOptions, ProductImage } from '@dtos/AddsDTO';
-import { useNewAdd } from '@contexts/newAddContext';
+import { useAdd } from '@contexts/addContext';
 import { AddsRoutesNavigationProps } from '@routes/adds.routes';
 
 type PhotoObject = {
@@ -52,7 +52,7 @@ const AddForm = ({ productData, productImages }: Props) => {
     });
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
-    const { setNewAdd, setNewAddImages } = useNewAdd();
+    const { setAdd, setAddImages } = useAdd();
 
     const handleCreateNewAdd = (data: FormInputsProps) => {
         data.is_new = data.is_new ? data.is_new : 'new';
@@ -74,20 +74,15 @@ const AddForm = ({ productData, productImages }: Props) => {
             is_new: data.is_new === 'new'
         }
         
-        setNewAdd(newAddData);
-        setNewAddImages(productsPhotos);
+        setAdd(newAddData);
+        setAddImages(productsPhotos);
         navigator.navigate('newAddPreview');
     }
 
+    console.log('Pagamento -> ', productData?.payment_methods)
+
     return (
         <>
-            <Box pt = {45} px = {6} bgColor = 'gray.600'>
-                <AppHeader 
-                    title = 'Criar anúncio'
-                    returnable
-                />
-            </Box>
-
             <ScrollView showsVerticalScrollIndicator = {false} bgColor = 'gray.700' pb = {20}> 
                 <VStack px = {6} bgColor = 'gray.600' pb = {4}>
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {2}>
@@ -177,15 +172,14 @@ const AddForm = ({ productData, productImages }: Props) => {
                     <Controller 
                         control = {control}
                         name = 'price'
-                        render = {({field: {onChange, value}}) => (
+                        render = {({field: {onChange}}) => (
                             <Input 
                                 placeholder = 'Valor do produto'
                                 preText = 'R$'
                                 keyboardType = 'numeric'
                                 mt = {2}
                                 onChangeText = {onChange}
-                                value = {value ? (value).toString() : ''}
-                                defaultValue = {productData?.price.toString() || ''}
+                                defaultValue = {productData?.price ? (productData?.price / 100).toFixed(2).replace('.', ',') : ''}
                                 errorMessage = {errors.price?.message}
                             />
                         )}

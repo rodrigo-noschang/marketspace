@@ -4,12 +4,14 @@ import AppRoutes from './app.routes';
 import NewAdd from '@screens/NewAdd';
 import NewAddPreview from '@screens/NewAddPreview';
 import AddPreview from '@screens/AddPreview';
+import AddEditing from '@screens/AddEditing';
 
 type AddsRoutes = {
     appHome: undefined,
     newAdd: undefined,
     newAddPreview: undefined,
-    addPreview: undefined
+    addPreview: undefined,
+    addEditing: undefined
 }
 
 export type AddsRoutesNavigationProps = NativeStackNavigationProp<AddsRoutes>;
@@ -39,6 +41,11 @@ const AddsRoutes = () => {
             <Screen 
                 name = 'addPreview'
                 component = {AddPreview}
+            />
+
+            <Screen 
+                name = 'addEditing'
+                component = {AddEditing}
             />
         </Navigator>
     )

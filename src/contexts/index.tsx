@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { AuthContextProvider } from "./authContext";
 import { UserAddsContexProvider } from "./userAddsContext";
-import { NewAddContextProvider } from "./newAddContext";
+import { NewAddContextProvider } from "./addContext";
 
 type ProvidersProps = {
     children: ReactNode

@@ -7,7 +7,7 @@ import AddProduct from "@components/AddProduct";
 import AppHeader from "@components/AppHeader";
 
 import { useUserAdds } from "@contexts/userAddsContext";
-import { useNewAdd } from "@contexts/newAddContext";
+import { useAdd } from "@contexts/addContext";
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 import { DatabaseProductDTO } from "@dtos/ProductDTO";
 import { NewProductAddDTO } from "@dtos/AddsDTO";
@@ -15,7 +15,7 @@ import api from "@services/api";
 
 const UserAdds = () => {
     const { userAdds } = useUserAdds();
-    const { setNewAdd, setNewAddImages } = useNewAdd();
+    const { setAdd, setAddImages } = useAdd();
 
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
     const [shownAdds, setShownAdds] = useState(userAdds);
@@ -56,8 +56,8 @@ const UserAdds = () => {
             } 
         })
 
-        setNewAdd(addData);
-        setNewAddImages(addImages);
+        setAdd(addData);
+        setAddImages(addImages);
 
         navigator.navigate('addPreview');
     }

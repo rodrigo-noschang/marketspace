@@ -1,7 +1,7 @@
 import { HStack, VStack } from "native-base"
 import { useNavigation } from '@react-navigation/native'
 
-import { useNewAdd } from "@contexts/newAddContext";
+import { useAdd } from "@contexts/addContext";
 import { useAuth } from "@contexts/authContext";
 
 import Button from "@components/Button";
@@ -9,7 +9,7 @@ import ProductsInfo from "@components/ProductsInfo";
 import AddPreviewHeader from "@components/AddPreviewHeader";
 
 const NewAddPreview = () => {
-    const { newAdd, newAddImages } = useNewAdd();
+    const { add, addImages } = useAdd();
     const { user } = useAuth();
 
     const navigator = useNavigation();
@@ -20,8 +20,8 @@ const NewAddPreview = () => {
             
             <ProductsInfo 
                 productAnnouncer = {user}
-                productData = {newAdd}
-                productImages = {newAddImages}
+                productData = {add}
+                productImages = {addImages}
             />
             
 
