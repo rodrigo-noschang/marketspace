@@ -7,11 +7,11 @@ import { useUserAdds } from '@contexts/userAddsContext';
 type Props = IPressableProps & {}
 
 const UserAddsHighlight = ({ ...rest }: Props) => {
-    const { userAdds, fetchAndStoreUserAdds, userAddsError } = useUserAdds();
+    const { userAdds, fetchUserAdds, userAddsError } = useUserAdds();
     const loadingAdds = !userAdds;
 
     useEffect(() => {
-        fetchAndStoreUserAdds();
+        fetchUserAdds();
     }, [])
 
     return (

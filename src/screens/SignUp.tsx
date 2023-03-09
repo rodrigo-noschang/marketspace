@@ -71,7 +71,11 @@ const SignUp = () => {
             setUserPhoto(selectedImage.assets[0].uri);
             setPhotoFile(photoFileObject);
         } catch (error) {
-            console.log('SignUp Image Picker error -> ', error);
+            toast.show({
+                title: 'Ocoorreu um erro durante a seleção das imagens, por favor, tente novamente',
+                placement: 'top',
+                bgColor: 'red.100'
+            })
         }
     }
 

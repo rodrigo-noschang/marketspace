@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { HStack, VStack } from "native-base"
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useToast } from "native-base";
 
 import { AppError } from "@utils/AppError";
@@ -15,42 +15,30 @@ import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 
-const NewAddPreview = () => {
+type RouteParams = {
+    selectedAddId: string
+}
+
+const EditingAddPreview = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { add, addImages } = useAdd();
     const { user } = useAuth();
 
-    const navigator = useNavigation<AddsRoutesNavigationProps>();
     const toast = useToast();
+    const navigator = useNavigation<AddsRoutesNavigationProps>();
+    const route = useRoute();
 
-    const postProductImages = async (productId: string, product: DatabaseProductDTO) => {
-        const productImagesForm = new FormData();
+    const {selectedAddId} = route.params as RouteParams;
 
-        productImagesForm.append('product_id', productId);
-
-        for (const image of addImages) {
-            productImagesForm.append('images', image as any)
-        }
-
-        const response = await api.post('/products/images', productImagesForm, {
-            headers: {
-                "Content-Type": 'multipart/form-data'
-            }
-        })
-    }
-    
-    const handleCreateAdd = async () => {
+    const handleEditAdd = async () => {
         setIsLoading(true);
         try {
-            const response = await api.post('/products', add);
-            const productId = response.data.id;
-    
-            postProductImages(productId, response.data);
+            await api.put(`/products/${selectedAddId}`, add);
 
             navigator.navigate('appHome')
         } catch (error) {
-            const title = error instanceof AppError ? error.message : 'Não foi possível criar o produto. Tente novamente mais tarde'
+            const title = error instanceof AppError ? error.message : 'Não foi possível editar o produto. Tente novamente mais tarde'
 
             setIsLoading(false);
 
@@ -83,12 +71,12 @@ const NewAddPreview = () => {
                 />
 
                 <Button 
-                    title = 'Publicar'
+                    title = 'Salvar alterações'
                     buttonTheme = 'blue'
                     iconName = 'tag'
                     w = '48%'
                     isLoading = {isLoading}
-                    onPress  = {handleCreateAdd}
+                    onPress  = {handleEditAdd}
                 />
             </HStack>
 
@@ -96,4 +84,4 @@ const NewAddPreview = () => {
     )
 }
 
-export default NewAddPreview;
+export default EditingAddPreview;

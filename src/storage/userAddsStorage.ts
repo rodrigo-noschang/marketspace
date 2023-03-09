@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { USER_ADDS_COLLECTION } from "./storageConfig"
 
-import { ProductAddDTO } from "@dtos/AddsDTO"
+import { NewProductAddDTO } from "@dtos/AddsDTO"
 
-export const userAddsStorageStoreUserAdds = async (userProducts: ProductAddDTO[]) => {
+export const userAddsStorageStoreUserAdds = async (userProducts: NewProductAddDTO[]) => {
     try {
         await AsyncStorage.setItem(USER_ADDS_COLLECTION, JSON.stringify(userProducts));
     } catch (error) {

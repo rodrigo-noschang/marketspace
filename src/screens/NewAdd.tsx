@@ -15,6 +15,8 @@ const NewAdd = () => {
                     warningMessage = 'Se você sair dessa tela, os dados do anúncio serão perdidos e será necessário inserí-los novamente'
                 />
             </Box>
+
+            
             <AddForm />
         </VStack>
     )

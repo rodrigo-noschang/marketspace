@@ -2,14 +2,14 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 
 import api from "@services/api";
 import { AppError } from "@utils/AppError";
-import { ProductAddDTO } from "@dtos/AddsDTO";
-import { userAddsStorageGetUserAdds, userAddsStorageStoreUserAdds } from "@storage/userAddsStorage";
+import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 
 type UserAddsDataProps = {
-    userAdds: ProductAddDTO[] | null
+    userAdds: DatabaseProductDTO[] | null
     userAddsError: string
-    fetchAndStoreUserAdds: () => Promise<void>
+    fetchUserAdds: () => Promise<void>,
+    insertNewAdd: (product: DatabaseProductDTO) => void
 }
 
 const UserAddsContext = createContext<UserAddsDataProps>({} as UserAddsDataProps);
@@ -19,37 +19,39 @@ type UserAddsProviderProps = {
 }
 
 export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
-    const [userAdds, setUserAdds] = useState<ProductAddDTO[] | null>(null);
+    const [userAdds, setUserAdds] = useState<DatabaseProductDTO[] | null>(null);
     const [userAddsError, setUserAddsError] = useState('');
 
-    const fetchAndStoreUserAdds = async () => {
+    const fetchUserAdds = async () => {
         try {
-            const storedUserAdds = await userAddsStorageGetUserAdds();
-
-            if (!storedUserAdds) {
-                const response = await api.get('/users/products');
-                setUserAdds(response.data);
-
-                await userAddsStorageStoreUserAdds(response.data);
-            }
-
-            setUserAdds(storedUserAdds);
+            const response = await api.get('/users/products');
+            
+            setUserAddsError('');
+            setUserAdds(response.data);
         } catch (error) {
-            console.log('Deu erro na request, paizin');
             const title = error instanceof AppError ? error.message : 'Não foi possível carregar seus anúncios. Tente novamente mais tarde';
             setUserAddsError(title);
         }
     }
 
+    const insertNewAdd = (product: DatabaseProductDTO) => {
+        if (userAdds) {
+            setUserAdds([...userAdds, product]);
+        } else {
+            setUserAdds([product])
+        }
+    }
+
     useEffect(() => {
-        fetchAndStoreUserAdds();
+        fetchUserAdds();
     }, [])
 
     return (
         <UserAddsContext.Provider value = {{
             userAdds,
             userAddsError,
-            fetchAndStoreUserAdds
+            fetchUserAdds,
+            insertNewAdd
         }}>
             { children }
 

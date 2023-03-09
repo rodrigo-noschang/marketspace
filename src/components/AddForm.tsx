@@ -39,10 +39,11 @@ const formSchema = yup.object({
 
 type Props = {
     productData?: NewProductAddDTO,
-    productImages?: ProductImage[]
+    productImages?: ProductImage[],
+    selectedAddId?: string
 }
 
-const AddForm = ({ productData, productImages }: Props) => {
+const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
     const [productsPhotos, setProductsPhotos] = useState<PhotoObject[]>(productImages || []);
     const [acceptsTrade, setAcceptsTrade] = useState(productData?.accept_trade || false);
     const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(productData?.payment_methods || []);
@@ -76,10 +77,16 @@ const AddForm = ({ productData, productImages }: Props) => {
         
         setAdd(newAddData);
         setAddImages(productsPhotos);
-        navigator.navigate('newAddPreview');
-    }
 
-    console.log('Pagamento -> ', productData?.payment_methods)
+        if (productData && productImages && selectedAddId) {
+            navigator.navigate('editingAddPreview', {
+                selectedAddId: selectedAddId
+            });
+
+        } else {
+            navigator.navigate('newAddPreview');
+        }
+    }
 
     return (
         <>

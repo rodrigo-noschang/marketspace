@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { VStack, Text, Heading, Select, HStack, Icon } from "native-base";
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
@@ -14,25 +15,12 @@ import { NewProductAddDTO } from "@dtos/AddsDTO";
 import api from "@services/api";
 
 const UserAdds = () => {
-    const { userAdds } = useUserAdds();
+    const { userAdds, fetchUserAdds } = useUserAdds();
     const { setAdd, setAddImages } = useAdd();
 
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
-    const [shownAdds, setShownAdds] = useState(userAdds);
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
-
-    const filterUserAdds = () => {
-        if (selectedAddsFilter === 'all') {
-            setShownAdds(userAdds);
-            return
-        }
-
-        const selectedAdd = userAdds?.filter(add => add.id === selectedAddsFilter);
-        if (selectedAdd) {
-            setShownAdds(selectedAdd);
-        }
-    }
 
     const handleNewAddRoute = () => {
         navigator.navigate('newAdd');
@@ -62,9 +50,9 @@ const UserAdds = () => {
         navigator.navigate('addPreview');
     }
     
-    useEffect(() => {
-        filterUserAdds();
-    }, [selectedAddsFilter])
+    useFocusEffect(useCallback(() => {
+        fetchUserAdds();
+    }, []))
 
     return (
         <VStack pt = {45} px = {6} flex = {1}>
@@ -110,8 +98,8 @@ const UserAdds = () => {
             </HStack>
 
             <HStack flexWrap = 'wrap' justifyContent = 'space-between'>
-                {shownAdds ? 
-                    shownAdds.map((add, index) => (
+                {userAdds ? 
+                    userAdds.map((add, index) => (
                         <AddProduct 
                             product = {add} 
                             key = {`${add.id}-${index}`}
