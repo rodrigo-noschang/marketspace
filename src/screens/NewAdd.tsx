@@ -1,7 +1,7 @@
 import { VStack, Box } from 'native-base';
 import AppHeader from '@components/AppHeader';
 
-import AddForm from '@components/AddForm';
+import NewAddForm from '@components/NewAddForm';
 
 const NewAdd = () => {
     
@@ -17,7 +17,7 @@ const NewAdd = () => {
             </Box>
 
             
-            <AddForm />
+            <NewAddForm />
         </VStack>
     )
 

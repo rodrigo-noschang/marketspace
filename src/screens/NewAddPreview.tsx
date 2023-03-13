@@ -4,36 +4,35 @@ import { useNavigation } from '@react-navigation/native'
 import { useToast } from "native-base";
 
 import { AppError } from "@utils/AppError";
-import { useAdd } from "@contexts/addContext";
+import { useNewAdd } from "@contexts/newAddContext";
 import { useAuth } from "@contexts/authContext";
 import api from "@services/api";
 
 import Button from "@components/Button";
 import ProductsInfo from "@components/ProductsInfo";
 import AddPreviewHeader from "@components/AddPreviewHeader";
-import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 
 const NewAddPreview = () => {
     const [isLoading, setIsLoading] = useState(false);
 
-    const { add, addImages } = useAdd();
+    const { newAdd, newAddImages } = useNewAdd();
     const { user } = useAuth();
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
     const toast = useToast();
 
-    const postProductImages = async (productId: string, product: DatabaseProductDTO) => {
+    const postProductImages = async (productId: string, ) => {
         const productImagesForm = new FormData();
 
         productImagesForm.append('product_id', productId);
 
-        for (const image of addImages) {
+        for (const image of newAddImages) {
             productImagesForm.append('images', image as any)
         }
 
-        const response = await api.post('/products/images', productImagesForm, {
+        await api.post('/products/images', productImagesForm, {
             headers: {
                 "Content-Type": 'multipart/form-data'
             }
@@ -43,10 +42,10 @@ const NewAddPreview = () => {
     const handleCreateAdd = async () => {
         setIsLoading(true);
         try {
-            const response = await api.post('/products', add);
+            const response = await api.post('/products', newAdd);
             const productId = response.data.id;
     
-            postProductImages(productId, response.data);
+            postProductImages(productId);
 
             navigator.navigate('appHome')
         } catch (error) {
@@ -68,8 +67,8 @@ const NewAddPreview = () => {
             
             <ProductsInfo 
                 productAnnouncer = {user}
-                productData = {add}
-                productImages = {addImages}
+                productData = {newAdd}
+                productImages = {newAddImages}
             />
             
 

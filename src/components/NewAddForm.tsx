@@ -1,27 +1,21 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Switch } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Box, ScrollView, VStack, Heading, Text, Radio, HStack } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
 
-import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import AppHeader from './AppHeader';
-import NewAddPhotoSelector from './NewAddPhotoSelector';
+
 import Input from './Input';
-import CheckBoxInput from './CheckBoxInput';
 import Button from './Button';
+import CheckBoxInput from './CheckBoxInput';
+import NewAddPhotoSelector from './NewAddPhotoSelector';
 
-import { NewProductAddDTO, PaymentOptions, ProductImage } from '@dtos/AddsDTO';
-import { useAdd } from '@contexts/addContext';
+import { NewProductAddDTO, PaymentOptions, NewProductImage } from '@dtos/AddsDTO';
+import { useNewAdd } from '@contexts/newAddContext';
 import { AddsRoutesNavigationProps } from '@routes/adds.routes';
-
-type PhotoObject = {
-    name: string, 
-    uri: string,
-    type: string
-}
 
 type FormInputsProps = {
     name: string, 
@@ -37,35 +31,19 @@ const formSchema = yup.object({
     is_new: yup.string()
 })
 
-type Props = {
-    productData?: NewProductAddDTO,
-    productImages?: ProductImage[],
-    selectedAddId?: string
-}
-
-const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
-    const [productsPhotos, setProductsPhotos] = useState<PhotoObject[]>(productImages || []);
-    const [acceptsTrade, setAcceptsTrade] = useState(productData?.accept_trade || false);
-    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(productData?.payment_methods || []);
+const NewAddForm = () => {
+    const [acceptsTrade, setAcceptsTrade] = useState(false);
+    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>([]);
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormInputsProps>({
         resolver: yupResolver(formSchema)
     });
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
-    const { setAdd, setAddImages } = useAdd();
+    const { newAddImages, setNewAdd } = useNewAdd();
 
-    const handleCreateNewAdd = (data: FormInputsProps) => {
+    const adaptFormInputsToApiPattern = (data: FormInputsProps) => {
         data.is_new = data.is_new ? data.is_new : 'new';
-
-        if (selectedPaymentOptions.length === 0) {
-            return Alert.alert('Informe as opções de pagamento', 'Selecione ao menos uma opção de pagamento');
-        }
-
-        if (productsPhotos.length === 0) {
-            return Alert.alert('Adicione imagens do seu produto', 'Coloque até 3 imagens para dar um toque a mais no seu anúncio!');
-        }
-
         data.price = data.price * 100;
 
         const newAddData: NewProductAddDTO = {
@@ -75,17 +53,21 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
             is_new: data.is_new === 'new'
         }
         
-        setAdd(newAddData);
-        setAddImages(productsPhotos);
+        setNewAdd(newAddData);
+    }
 
-        if (productData && productImages && selectedAddId) {
-            navigator.navigate('editingAddPreview', {
-                selectedAddId: selectedAddId
-            });
-
-        } else {
-            navigator.navigate('newAddPreview');
+    const handleCreateNewAdd = (data: FormInputsProps) => {
+        if (selectedPaymentOptions.length === 0) {
+            return Alert.alert('Informe as opções de pagamento', 'Selecione ao menos uma opção de pagamento');
         }
+
+        if (newAddImages.length === 0) {
+            return Alert.alert('Adicione imagens do seu produto', 'Coloque até 3 imagens para dar um toque a mais no seu anúncio!');
+        }
+
+        adaptFormInputsToApiPattern(data);
+        
+        navigator.navigate('newAddPreview');
     }
 
     return (
@@ -101,8 +83,7 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
                     </Text>
 
                     <NewAddPhotoSelector 
-                        productsPhotos = {productsPhotos}
-                        setProductsPhotos = {setProductsPhotos}
+                        
                     />
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
@@ -118,7 +99,6 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
                                 placeholder = 'Título do anúncio'
                                 onChangeText = {onChange}
                                 value = {value}
-                                defaultValue = {productData?.name || ''}
                                 errorMessage = {errors.name?.message}
                             />
                         )}
@@ -136,7 +116,6 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
                                 multiline
                                 onChangeText = {onChange}
                                 value = {value}
-                                defaultValue = {productData?.description || ''}
                                 errorMessage = {errors.description?.message}
                             />
                         )}
@@ -151,7 +130,6 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
                                 colorScheme = 'indigo'
                                 name = 'productIsNew'
                                 value = {value || 'new'}
-                                defaultValue = {productData?.is_new ? 'new' : 'old'}
                                 onChange = {onChange}
                             >
                                 <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
@@ -186,7 +164,6 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
                                 keyboardType = 'numeric'
                                 mt = {2}
                                 onChangeText = {onChange}
-                                defaultValue = {productData?.price ? (productData?.price / 100).toFixed(2).replace('.', ',') : ''}
                                 errorMessage = {errors.price?.message}
                             />
                         )}
@@ -273,4 +250,4 @@ const AddForm = ({ productData, productImages, selectedAddId }: Props) => {
     )
 }
 
-export default AddForm;
+export default NewAddForm;

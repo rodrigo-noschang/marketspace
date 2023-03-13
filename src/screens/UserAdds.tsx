@@ -8,7 +8,6 @@ import AddProduct from "@components/AddProduct";
 import AppHeader from "@components/AppHeader";
 
 import { useUserAdds } from "@contexts/userAddsContext";
-import { useAdd } from "@contexts/addContext";
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 import { DatabaseProductDTO } from "@dtos/ProductDTO";
 import { NewProductAddDTO } from "@dtos/AddsDTO";
@@ -16,7 +15,6 @@ import api from "@services/api";
 
 const UserAdds = () => {
     const { userAdds, fetchUserAdds } = useUserAdds();
-    const { setAdd, setAddImages } = useAdd();
 
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
 
@@ -27,27 +25,25 @@ const UserAdds = () => {
     }
 
     const handleShowAdd = (add: DatabaseProductDTO) => {
-        const addData: NewProductAddDTO = {
-            name: add.name,
-            description: add.description,
-            is_new: add.is_new,
-            price: add.price,
-            accept_trade: add.accept_trade,
-            payment_methods: add.payment_methods.map(method => method.key),
-        }
+        console.log('IMPLEMENTAR ADD PREVIEW NA PAGINA USERADDS!!!!');
+        // const addData: NewProductAddDTO = {
+        //     name: add.name,
+        //     description: add.description,
+        //     is_new: add.is_new,
+        //     price: add.price,
+        //     accept_trade: add.accept_trade,
+        //     payment_methods: add.payment_methods.map(method => method.key),
+        // }
 
-        const addImages = add.product_images.map(image => {
-            return {
-                name: '',
-                type: '',
-                uri: `${api.defaults.baseURL}/images/${image.path}`
-            } 
-        })
+        // const addImages = add.product_images.map(image => {
+        //     return {
+        //         name: '',
+        //         type: '',
+        //         uri: `${api.defaults.baseURL}/images/${image.path}`
+        //     } 
+        // })
 
-        setAdd(addData);
-        setAddImages(addImages);
-
-        navigator.navigate('addPreview');
+        // navigator.navigate('addPreview');
     }
     
     useFocusEffect(useCallback(() => {

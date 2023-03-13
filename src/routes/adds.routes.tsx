@@ -3,9 +3,6 @@ import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-na
 import AppRoutes from './app.routes';
 import NewAdd from '@screens/NewAdd';
 import NewAddPreview from '@screens/NewAddPreview';
-import AddPreview from '@screens/AddPreview';
-import AddEditing from '@screens/AddEditing';
-import EditingAddPreview from '@screens/EditingAddPreview';
 
 type AddsRoutes = {
     appHome: undefined,
@@ -42,20 +39,6 @@ const AddsRoutes = () => {
                 component = {NewAddPreview}
             />
 
-            <Screen 
-                name = 'editingAddPreview'
-                component = {EditingAddPreview}
-            />
-
-            <Screen 
-                name = 'addPreview'
-                component = {AddPreview}
-            />
-
-            <Screen 
-                name = 'addEditing'
-                component = {AddEditing}
-            />
         </Navigator>
     )
 

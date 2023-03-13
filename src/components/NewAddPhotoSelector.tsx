@@ -1,24 +1,15 @@
+import { useState } from "react";
 import { Alert } from "react-native";
 import { HStack, Pressable, Image, Icon, Badge, Center } from "native-base"
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
 import { useAuth } from "@contexts/authContext";
+import { useNewAdd } from "@contexts/newAddContext";
 
-type PhotoObject = {
-    name: string, 
-    uri: string,
-    type: string
-}
-
-type Props = {
-    productsPhotos: PhotoObject[],
-    setProductsPhotos: (newPhotoObjectArray: PhotoObject[]) => void;
-}
-
-const NewAddPhotoSelector = ({ productsPhotos, setProductsPhotos }: Props) => {
-    
+const NewAddPhotoSelector = () => {
     const { user } = useAuth();
+    const { newAddImages, setNewAddImages, deleteAddImage } = useNewAdd();
 
     const selectImageFromGalery = async () => {
         const selectedImage = await ImagePicker.launchImageLibraryAsync({
@@ -42,9 +33,8 @@ const NewAddPhotoSelector = ({ productsPhotos, setProductsPhotos }: Props) => {
         return fileObject
     }
 
-    const deleteProductPhoto = (photoUri: string) => {
-        const updatedPhotos = productsPhotos.filter(photos => photos.uri !== photoUri);
-        setProductsPhotos(updatedPhotos);
+    const deleteProductPhotoLocally = async (photoUri: string) => {
+        deleteAddImage(photoUri);
     }
 
     const handleChangeOrDeleteProduct = async (photoUri: string) => {
@@ -55,7 +45,7 @@ const NewAddPhotoSelector = ({ productsPhotos, setProductsPhotos }: Props) => {
             },
             {
                 text: 'Excluir',
-                onPress: () => deleteProductPhoto(photoUri)
+                onPress: () => deleteProductPhotoLocally(photoUri)
             }
         ]);
     }
@@ -64,13 +54,13 @@ const NewAddPhotoSelector = ({ productsPhotos, setProductsPhotos }: Props) => {
         const photoObject = await selectImageFromGalery();
 
         if (!photoObject) return;
-        setProductsPhotos([...productsPhotos, photoObject])
+        setNewAddImages([...newAddImages, photoObject])
     }
 
     return (
         <HStack flexWrap = 'wrap' mt = {3}>
-            { productsPhotos.length > 0 &&
-                productsPhotos.map(photo => (
+            { newAddImages.length > 0 &&
+                newAddImages.map(photo => (
                     <Pressable onPress = {() => handleChangeOrDeleteProduct(photo.uri)} key = {photo.uri}>
                         <Badge position = 'absolute' zIndex = {2} bgColor = 'gray.200' rounded = 'full' p = {0} top = {1} right = {4}>
                             <Icon 
@@ -93,7 +83,7 @@ const NewAddPhotoSelector = ({ productsPhotos, setProductsPhotos }: Props) => {
                 ))
             }
 
-            { productsPhotos.length < 3 &&
+            { newAddImages.length < 3 &&
                 <Pressable bgColor = 'gray.500' w = {100} h = {100} rounded = 'md' onPress = {handleAddProductImage}>
                     <Center flex = {1}>
                         <Icon 
