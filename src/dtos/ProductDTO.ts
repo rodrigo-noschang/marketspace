@@ -1,7 +1,7 @@
 export type PaymentOptionsKeys = 'boleto' | 'pix' | 'cash' | 'card' | 'deposit';  
 export type PaymentOptionsValues = 'Boleto' | 'Pix' | 'Dinhheiro' | 'Cartão de crédito' | 'Depósito';  
 
-type DatabasePaymentOptions = {
+export type DatabasePaymentOptions = {
     key: PaymentOptionsKeys,
     name: PaymentOptionsValues
 }

@@ -1,23 +1,47 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
 import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Carousel from 'react-native-reanimated-carousel';
 
+import Loading from './Loading';
+
 import { UserDTO } from '@dtos/UserDTO';
-import { ProductImage } from '@dtos/AddsDTO';
+import { NewProductImage, PaymentOptions } from '@dtos/AddsDTO';
 import { NewProductAddDTO } from '@dtos/AddsDTO';
+import { DatabaseImages, DatabasePaymentOptions, DatabaseProductDTO } from '@dtos/ProductDTO';
 
 import api from '@services/api';
+import { useAuth } from '@contexts/authContext';
+import { useNewAdd } from '@contexts/newAddContext';
+import { useUserAdds } from '@contexts/userAddsContext';
+
+// type Props = {
+//     productAnnouncer: UserDTO,
+//     newAddData?: NewProductAddDTO,
+//     existingAddData?: DatabaseProductDTO,
+//     newAddImages?: NewProductImage[],
+//     existingAddImages?: DatabaseImages[]
+//     children?: ReactNode
+// }
+
+type AddOptions = 'new' | 'existing';
 
 type Props = {
-    productAnnouncer: UserDTO,
-    productData: NewProductAddDTO,
-    productImages: ProductImage[],
+    addType: AddOptions,
     children?: ReactNode
 }
 
-const ProductsInfo = ({ productAnnouncer, productData, productImages, children }: Props) => {
+// const ProductsInfo = ({ productAnnouncer, newAddData, existingAddData, newAddImages, existingAddImages, children }: Props) => {
+const ProductsInfo = ({ addType, children }: Props) => {
+    const [productUsableData, setProductUsableData] = useState<NewProductAddDTO>({} as NewProductAddDTO);
+    const [productUsableImages, setProductUsableImages] = useState<NewProductImage[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const { user } = useAuth();
+    const { onFocusAdd } = useUserAdds();
+    const { newAdd, newAddImages } = useNewAdd();
+
     const paymentMethodsIcons = {
         boleto: 'barcode-scan',
         pix: 'qrcode',
@@ -34,12 +58,62 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
         card: 'Cartão de crédito'
     }
 
+    const setPaymentMethodsToAddsDTOStandard = (databaseMethods: DatabasePaymentOptions[]) => {
+        const paymentMethodsKeys = databaseMethods.map(method => {
+            return method.key
+        })
+
+        return paymentMethodsKeys;
+    }
+
+    const setProductImagesToAddsDTOStandard = (databaseImages: DatabaseImages[]) => {
+        const productImages = databaseImages.map(image => {
+            return {
+                name: '',
+                type: '',
+                uri: `${api.defaults.baseURL}/images/${image.path}`
+            }
+        })
+
+        return productImages;
+    }
+
+    useEffect(() => {
+        setIsLoading(true);
+
+        if (addType === 'existing') {
+            const databasePaymentMethods = onFocusAdd?.payment_methods;
+            const databaseImages = onFocusAdd?.product_images;
+
+            if (!databasePaymentMethods || !databaseImages) return;
+
+            const standardPaymentMethods = setPaymentMethodsToAddsDTOStandard(databasePaymentMethods);
+            const standardImages = setProductImagesToAddsDTOStandard(databaseImages);
+
+            const usableData = {
+                ...onFocusAdd,
+                payment_methods: standardPaymentMethods,
+            }
+        
+            setProductUsableData(usableData);
+            setProductUsableImages(standardImages);
+        } else {
+            setProductUsableData(newAdd);
+            setProductUsableImages(newAddImages);
+        }
+
+        setIsLoading(false);
+    })
+
     return (
+        isLoading ?
+            <Loading />
+        :
         <>
             <Carousel 
                 width = {Dimensions.get('window').width} 
                 height = {350}
-                data = {productImages}
+                data = {productUsableImages}
                 scrollAnimationDuration = {1000}
                 loop = {false}
                 renderItem = {({ item }) => (
@@ -51,12 +125,12 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                     />
                 )}
             />
-
+            
             <ScrollView flex = {1} bgColor = 'gray.600' px = {6} showsVerticalScrollIndicator = {false}>
                 <VStack pb = {6}>
                     <HStack alignItems = 'center' mt = {4}>
                         <Image 
-                            source = {{uri: `${api.defaults.baseURL}/images/${productAnnouncer.avatar}`}}
+                            source = {{uri: `${api.defaults.baseURL}/images/${user.avatar}`}}
                             alt = 'User profile photo'
                             w = {10}
                             h = {10}
@@ -66,7 +140,7 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                         />
 
                         <Text fontFamily = 'body' fontSize = 'md' color = 'gray.200' ml = {2}> 
-                            {productAnnouncer.name} 
+                            {user.name} 
                         </Text>
                     </HStack>
 
@@ -75,29 +149,29 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                         rounded = 'full'
                         px = {1}
                         py = {0}
-                        bgColor = {productData.is_new ? 'blue.200' : 'gray.500'}
+                        bgColor = {productUsableData.is_new ? 'blue.200' : 'gray.500'}
                         mt = {6}
                     >
-                        <Text fontSize = 'xs' fontFamily = 'heading' color = {productData.is_new ? 'gray.700' : 'gray.200'}>
-                            {productData.is_new ? 'NOVO' : 'USADO'}
+                        <Text fontSize = 'xs' fontFamily = 'heading' color = {productUsableData.is_new ? 'gray.700' : 'gray.200'}>
+                            {productUsableData.is_new ? 'NOVO' : 'USADO'}
                         </Text>
                     </Badge>
 
                     <HStack mt = {3} alignItems = 'flex-start'>
                         <Heading fontSize = 'xl' fontFamily = 'heading' color = 'gray.200' flex = {1}>
-                            {productData.name}
+                            {productUsableData.name}
                         </Heading>
 
                         <Heading fontSize = 'sm' fontFamily = 'heading' color = 'blue.200' mt = {2}>
                             R$
                         </Heading>
                         <Heading fontSize = 'xl' fontFamily = 'heading' color = 'blue.200' ml = {1}>
-                            {(productData.price/100).toFixed(2).replace('.', ',')}
+                            {(productUsableData.price/100).toFixed(2).replace('.', ',')}
                         </Heading>
                     </HStack>
 
                     <Text fontFamily = 'body' fontSize = 'md' color = 'gray.200' mt = {2}>
-                        {productData.description}
+                        {productUsableData.description}
                     </Text>
 
                     <HStack mt = {4} alignItems = 'center'>
@@ -106,7 +180,7 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                         </Heading>
 
                         <Text fontFamily = 'body' fontSize = 'md' color = 'gray.200' ml = {2}>
-                            {productData.accept_trade ? 'Sim' : 'Não'}
+                            {productUsableData.accept_trade ? 'Sim' : 'Não'}
                         </Text>
                     </HStack>
 
@@ -114,7 +188,7 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                         Meios de pagamento
                     </Heading>
 
-                    { productData.payment_methods.map(method => (
+                    { productUsableData.payment_methods.map(method => (
                         <HStack alignItems = 'flex-end' mt = {1} key = {method}>
                             <Icon
                                 as = {MaterialCommunityIcons}
@@ -133,6 +207,7 @@ const ProductsInfo = ({ productAnnouncer, productData, productImages, children }
                 </VStack>
             </ScrollView>
         </>
+        
     )
 }
 

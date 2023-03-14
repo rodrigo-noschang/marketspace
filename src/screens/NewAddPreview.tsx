@@ -66,9 +66,10 @@ const NewAddPreview = () => {
             <AddPreviewHeader />
             
             <ProductsInfo 
-                productAnnouncer = {user}
-                productData = {newAdd}
-                productImages = {newAddImages}
+                // productAnnouncer = {user}
+                // newAddData = {newAdd}
+                // newAddImages = {newAddImages}
+                addType = 'new'
             />
             
 

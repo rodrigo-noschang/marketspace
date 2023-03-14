@@ -7,9 +7,11 @@ import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 type UserAddsDataProps = {
     userAdds: DatabaseProductDTO[] | null
-    userAddsError: string
+    userAddsError: string,
+    onFocusAdd: DatabaseProductDTO | null,
     fetchUserAdds: () => Promise<void>,
-    insertNewAdd: (product: DatabaseProductDTO) => void
+    insertNewAdd: (product: DatabaseProductDTO) => void,
+    setAddOnFocus: (addId: string) => void
 }
 
 const UserAddsContext = createContext<UserAddsDataProps>({} as UserAddsDataProps);
@@ -20,6 +22,7 @@ type UserAddsProviderProps = {
 
 export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
     const [userAdds, setUserAdds] = useState<DatabaseProductDTO[] | null>(null);
+    const [onFocusAdd, setOnFocusAdd] = useState<DatabaseProductDTO | null>(null);
     const [userAddsError, setUserAddsError] = useState('');
 
     const fetchUserAdds = async () => {
@@ -42,6 +45,13 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
         }
     }
 
+    const setAddOnFocus = (addId: string) => {
+        const addToBeFocused = userAdds?.find(add => add.id === addId);
+        if (!addToBeFocused) return;
+
+        setOnFocusAdd(addToBeFocused);
+    }
+
     useEffect(() => {
         fetchUserAdds();
     }, [])
@@ -50,8 +60,10 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
         <UserAddsContext.Provider value = {{
             userAdds,
             userAddsError,
+            onFocusAdd,
             fetchUserAdds,
-            insertNewAdd
+            insertNewAdd,
+            setAddOnFocus
         }}>
             { children }
 

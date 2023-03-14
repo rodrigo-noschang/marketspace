@@ -14,7 +14,7 @@ import { NewProductAddDTO } from "@dtos/AddsDTO";
 import api from "@services/api";
 
 const UserAdds = () => {
-    const { userAdds, fetchUserAdds } = useUserAdds();
+    const { userAdds, fetchUserAdds, setAddOnFocus } = useUserAdds();
 
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
 
@@ -25,25 +25,9 @@ const UserAdds = () => {
     }
 
     const handleShowAdd = (add: DatabaseProductDTO) => {
-        console.log('IMPLEMENTAR ADD PREVIEW NA PAGINA USERADDS!!!!');
-        // const addData: NewProductAddDTO = {
-        //     name: add.name,
-        //     description: add.description,
-        //     is_new: add.is_new,
-        //     price: add.price,
-        //     accept_trade: add.accept_trade,
-        //     payment_methods: add.payment_methods.map(method => method.key),
-        // }
+        setAddOnFocus(add.id);
 
-        // const addImages = add.product_images.map(image => {
-        //     return {
-        //         name: '',
-        //         type: '',
-        //         uri: `${api.defaults.baseURL}/images/${image.path}`
-        //     } 
-        // })
-
-        // navigator.navigate('addPreview');
+        navigator.navigate('existingAddOverview');
     }
     
     useFocusEffect(useCallback(() => {
