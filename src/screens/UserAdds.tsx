@@ -10,11 +10,9 @@ import AppHeader from "@components/AppHeader";
 import { useUserAdds } from "@contexts/userAddsContext";
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 import { DatabaseProductDTO } from "@dtos/ProductDTO";
-import { NewProductAddDTO } from "@dtos/AddsDTO";
-import api from "@services/api";
 
 const UserAdds = () => {
-    const { userAdds, fetchUserAdds, setAddOnFocus } = useUserAdds();
+    const { userAdds, fetchUserAdds, putAddOnFocus } = useUserAdds();
 
     const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
 
@@ -23,9 +21,9 @@ const UserAdds = () => {
     const handleNewAddRoute = () => {
         navigator.navigate('newAdd');
     }
-
+    
     const handleShowAdd = (add: DatabaseProductDTO) => {
-        setAddOnFocus(add.id);
+        putAddOnFocus(add.id);
 
         navigator.navigate('existingAddOverview');
     }
@@ -37,7 +35,6 @@ const UserAdds = () => {
     return (
         <VStack pt = {45} px = {6} flex = {1}>
             <AppHeader 
-                // returnable
                 title = 'Meus anúncios'
                 action = {handleNewAddRoute}
                 actionIcon = "plus"

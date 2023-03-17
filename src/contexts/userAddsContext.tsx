@@ -11,7 +11,7 @@ type UserAddsDataProps = {
     onFocusAdd: DatabaseProductDTO | null,
     fetchUserAdds: () => Promise<void>,
     insertNewAdd: (product: DatabaseProductDTO) => void,
-    setAddOnFocus: (addId: string) => void
+    putAddOnFocus: (addId: string) => void
 }
 
 const UserAddsContext = createContext<UserAddsDataProps>({} as UserAddsDataProps);
@@ -45,9 +45,11 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
         }
     }
 
-    const setAddOnFocus = (addId: string) => {
+    const putAddOnFocus = (addId: string) => {
         const addToBeFocused = userAdds?.find(add => add.id === addId);
         if (!addToBeFocused) return;
+
+        console.log('Put Add On Focus -> ', addToBeFocused);
 
         setOnFocusAdd(addToBeFocused);
     }
@@ -63,7 +65,7 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
             onFocusAdd,
             fetchUserAdds,
             insertNewAdd,
-            setAddOnFocus
+            putAddOnFocus
         }}>
             { children }
 

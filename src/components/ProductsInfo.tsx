@@ -1,12 +1,11 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
-import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView } from 'native-base';
+import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Carousel from 'react-native-reanimated-carousel';
 
 import Loading from './Loading';
 
-import { UserDTO } from '@dtos/UserDTO';
 import { NewProductImage, PaymentOptions } from '@dtos/AddsDTO';
 import { NewProductAddDTO } from '@dtos/AddsDTO';
 import { DatabaseImages, DatabasePaymentOptions, DatabaseProductDTO } from '@dtos/ProductDTO';
@@ -16,15 +15,6 @@ import { useAuth } from '@contexts/authContext';
 import { useNewAdd } from '@contexts/newAddContext';
 import { useUserAdds } from '@contexts/userAddsContext';
 
-// type Props = {
-//     productAnnouncer: UserDTO,
-//     newAddData?: NewProductAddDTO,
-//     existingAddData?: DatabaseProductDTO,
-//     newAddImages?: NewProductImage[],
-//     existingAddImages?: DatabaseImages[]
-//     children?: ReactNode
-// }
-
 type AddOptions = 'new' | 'existing';
 
 type Props = {
@@ -32,7 +22,6 @@ type Props = {
     children?: ReactNode
 }
 
-// const ProductsInfo = ({ productAnnouncer, newAddData, existingAddData, newAddImages, existingAddImages, children }: Props) => {
 const ProductsInfo = ({ addType, children }: Props) => {
     const [productUsableData, setProductUsableData] = useState<NewProductAddDTO>({} as NewProductAddDTO);
     const [productUsableImages, setProductUsableImages] = useState<NewProductImage[]>([]);
@@ -59,15 +48,12 @@ const ProductsInfo = ({ addType, children }: Props) => {
     }
 
     const setPaymentMethodsToAddsDTOStandard = (databaseMethods: DatabasePaymentOptions[]) => {
-        const paymentMethodsKeys = databaseMethods.map(method => {
-            return method.key
-        })
-
-        return paymentMethodsKeys;
+        return databaseMethods.map(method => method.key);
     }
-
+    
     const setProductImagesToAddsDTOStandard = (databaseImages: DatabaseImages[]) => {
-        const productImages = databaseImages.map(image => {
+        const productImages = databaseImages.map((image, i) => {
+            
             return {
                 name: '',
                 type: '',
@@ -78,7 +64,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
         return productImages;
     }
 
-    useEffect(() => {
+    const checkAddTypeAndFormatData = () => {
         setIsLoading(true);
 
         if (addType === 'existing') {
@@ -101,15 +87,24 @@ const ProductsInfo = ({ addType, children }: Props) => {
             setProductUsableData(newAdd);
             setProductUsableImages(newAddImages);
         }
-
+        
         setIsLoading(false);
-    })
+    }
+
+    console.log('Products Usable Data -> ', productUsableData);
+
+    useEffect(() => {
+        checkAddTypeAndFormatData();
+    }, []);
 
     return (
         isLoading ?
-            <Loading />
+            <Box flex = {1}>
+                <Loading />
+            </Box>
         :
-        <>
+        
+        <Box >
             <Carousel 
                 width = {Dimensions.get('window').width} 
                 height = {350}
@@ -126,7 +121,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
                 )}
             />
             
-            <ScrollView flex = {1} bgColor = 'gray.600' px = {6} showsVerticalScrollIndicator = {false}>
+            <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6}>
                 <VStack pb = {6}>
                     <HStack alignItems = 'center' mt = {4}>
                         <Image 
@@ -206,8 +201,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
                     {children}
                 </VStack>
             </ScrollView>
-        </>
-        
+        </Box>
     )
 }
 
