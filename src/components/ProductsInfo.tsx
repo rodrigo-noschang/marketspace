@@ -91,8 +91,6 @@ const ProductsInfo = ({ addType, children }: Props) => {
         setIsLoading(false);
     }
 
-    console.log('Products Usable Data -> ', productUsableData);
-
     useEffect(() => {
         checkAddTypeAndFormatData();
     }, []);
@@ -104,7 +102,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
             </Box>
         :
         
-        <Box >
+        <Box flex = {1}>
             <Carousel 
                 width = {Dimensions.get('window').width} 
                 height = {350}
@@ -121,7 +119,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
                 )}
             />
             
-            <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6}>
+            <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6} flex = {1}>
                 <VStack pb = {6}>
                     <HStack alignItems = 'center' mt = {4}>
                         <Image 

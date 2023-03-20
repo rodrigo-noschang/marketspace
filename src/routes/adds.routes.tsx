@@ -2,6 +2,7 @@ import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-na
 
 import AppRoutes from './app.routes';
 import NewAdd from '@screens/NewAdd';
+import EditAdd from '@screens/EditAdd';
 import NewAddPreview from '@screens/NewAddPreview';
 import ExistingAddOverview from '@screens/ExistingAddOverview';
 
@@ -9,7 +10,8 @@ type AddsRoutes = {
     appHome: undefined,
     newAdd: undefined,
     newAddPreview: undefined,
-    existingAddOverview: undefined
+    existingAddOverview: undefined,
+    editAdd: undefined
 }
 
 export type AddsRoutesNavigationProps = NativeStackNavigationProp<AddsRoutes>;
@@ -39,6 +41,11 @@ const AddsRoutes = () => {
             <Screen 
                 name = 'existingAddOverview'
                 component = {ExistingAddOverview}
+            />
+
+            <Screen 
+                name = 'editAdd'
+                component = {EditAdd}
             />
 
         </Navigator>

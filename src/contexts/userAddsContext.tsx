@@ -49,8 +49,6 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
         const addToBeFocused = userAdds?.find(add => add.id === addId);
         if (!addToBeFocused) return;
 
-        console.log('Put Add On Focus -> ', addToBeFocused);
-
         setOnFocusAdd(addToBeFocused);
     }
 

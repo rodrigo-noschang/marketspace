@@ -16,6 +16,7 @@ import NewAddPhotoSelector from './NewAddPhotoSelector';
 import { NewProductAddDTO, PaymentOptions, NewProductImage } from '@dtos/AddsDTO';
 import { useNewAdd } from '@contexts/newAddContext';
 import { AddsRoutesNavigationProps } from '@routes/adds.routes';
+import { DatabaseProductDTO } from '@dtos/ProductDTO';
 
 type FormInputsProps = {
     name: string, 
@@ -30,10 +31,14 @@ const formSchema = yup.object({
     is_new: yup.string()
 })
 
-const NewAddForm = () => {
-    const [acceptsTrade, setAcceptsTrade] = useState(false);
-    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>([]);
-    const [controlledPriceInput, setControlledPriceInput] = useState('0,00');
+type Props = {
+    addData: DatabaseProductDTO
+}
+
+const EditingAddForm = ({ addData }: Props) => {
+    const [acceptsTrade, setAcceptsTrade] = useState(addData.accept_trade);
+    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(addData.payment_methods.map(method => method.key));
+    const [controlledPriceInput, setControlledPriceInput] = useState((addData.price/100).toFixed(2).replace('.', ','));
     const [priceInputError, setPriceInputError] = useState('');
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormInputsProps>({
@@ -96,9 +101,7 @@ const NewAddForm = () => {
                         Escolha até 3 imagens para mostrar o quanto o seu produto é incrível!
                     </Text>
 
-                    <NewAddPhotoSelector 
-                        
-                    />
+                    <NewAddPhotoSelector />
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
                         Sobre o produto
@@ -113,6 +116,7 @@ const NewAddForm = () => {
                                 placeholder = 'Título do anúncio'
                                 onChangeText = {onChange}
                                 value = {value}
+                                defaultValue = {addData.name}
                                 errorMessage = {errors.name?.message}
                             />
                         )}
@@ -130,6 +134,7 @@ const NewAddForm = () => {
                                 multiline
                                 onChangeText = {onChange}
                                 value = {value}
+                                defaultValue = {addData.description}
                                 errorMessage = {errors.description?.message}
                             />
                         )}
@@ -143,7 +148,7 @@ const NewAddForm = () => {
                             <Radio.Group
                                 colorScheme = 'indigo'
                                 name = 'productIsNew'
-                                value = {value || 'new'}
+                                value = {addData.is_new ? 'new' : 'old'}
                                 onChange = {onChange}
                             >
                                 <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
@@ -257,4 +262,4 @@ const NewAddForm = () => {
     )
 }
 
-export default NewAddForm;
+export default EditingAddForm;

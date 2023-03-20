@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { HStack, VStack } from "native-base"
+import { HStack, VStack, ScrollView } from "native-base"
 import { useNavigation } from '@react-navigation/native'
 import { useToast } from "native-base";
 
 import { AppError } from "@utils/AppError";
 import { useNewAdd } from "@contexts/newAddContext";
-import { useAuth } from "@contexts/authContext";
 import api from "@services/api";
 
 import Button from "@components/Button";
@@ -18,7 +17,6 @@ const NewAddPreview = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { newAdd, newAddImages } = useNewAdd();
-    const { user } = useAuth();
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
     const toast = useToast();
@@ -64,33 +62,29 @@ const NewAddPreview = () => {
     return (
         <VStack flex = {1} bgColor = 'gray.700'> 
             <AddPreviewHeader />
-            
-            <ProductsInfo 
-                // productAnnouncer = {user}
-                // newAddData = {newAdd}
-                // newAddImages = {newAddImages}
-                addType = 'new'
-            />
-            
 
-            <HStack px = {6} py = {6} justifyContent = 'space-between'>
-                <Button 
-                    title = 'Voltar e editar'
-                    buttonTheme = 'light'
-                    iconName = 'arrowleft'
-                    w = '48%'
-                    onPress = {() => navigator.goBack()}
-                />
+            <ScrollView>
+                <ProductsInfo addType = 'new' />
+                
+                <HStack px = {6} py = {6} justifyContent = 'space-between'>
+                    <Button 
+                        title = 'Voltar e editar'
+                        buttonTheme = 'light'
+                        iconName = 'arrowleft'
+                        w = '48%'
+                        onPress = {() => navigator.goBack()}
+                    />
 
-                <Button 
-                    title = 'Publicar'
-                    buttonTheme = 'blue'
-                    iconName = 'tag'
-                    w = '48%'
-                    isLoading = {isLoading}
-                    onPress  = {handleCreateAdd}
-                />
-            </HStack>
+                    <Button 
+                        title = 'Publicar'
+                        buttonTheme = 'blue'
+                        iconName = 'tag'
+                        w = '48%'
+                        isLoading = {isLoading}
+                        onPress  = {handleCreateAdd}
+                    />
+                </HStack>
+            </ScrollView>
 
         </VStack>
     )
