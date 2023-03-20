@@ -1,6 +1,7 @@
 export type PaymentOptions = 'boleto' | 'pix' | 'cash' | 'card' | 'deposit';  
 
 export type NewProductImage = {
+    id?: string
     name: string,
     type: string,
     uri: string

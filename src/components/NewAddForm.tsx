@@ -44,6 +44,7 @@ const NewAddForm = () => {
     const { newAddImages, setNewAdd } = useNewAdd();
 
     const formatPriceInput = (price: string) => {
+        setPriceInputError('');
         const priceWithoutTheComma = Number(price.replace(',', ''));
 
         const newPrice = (priceWithoutTheComma/100).toFixed(2).replace('.', ',');
@@ -52,7 +53,7 @@ const NewAddForm = () => {
 
     const adaptFormInputsToApiPattern = (data: FormInputsProps) => {
         data.is_new = data.is_new ? data.is_new : 'new';
-        data.price = data.price * 100;
+        data.price = Number(controlledPriceInput.replace(',', ''));
 
         const newAddData: NewProductAddDTO = {
             ...data, 

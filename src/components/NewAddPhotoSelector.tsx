@@ -1,15 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { HStack, Pressable, Image, Icon, Badge, Center } from "native-base"
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { HStack, Pressable, Image, Icon, Badge, Center, useToast } from "native-base"
 
+import Loading from "./Loading";
+
+import api from "@services/api";
+import { AppError } from "@utils/AppError";
+import { NewProductImage } from "@dtos/AddsDTO";
 import { useAuth } from "@contexts/authContext";
+import { DatabaseImages } from "@dtos/ProductDTO";
 import { useNewAdd } from "@contexts/newAddContext";
 
-const NewAddPhotoSelector = () => {
+type Props = {
+    existingAddImages?: DatabaseImages[]
+    productId?: string,
+    updateNewImages: NewProductImage[],
+    addImageIdToBeDeleted?: (imageId: string) => void,
+    setUpdatedNewImages?: (imagesObjects: NewProductImage[]) => void
+}
+
+const NewAddPhotoSelector = ({ existingAddImages, productId, updateNewImages, addImageIdToBeDeleted, setUpdatedNewImages }: Props) => {
+    const [usableImages, setUsableImages] = useState<NewProductImage[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    
     const { user } = useAuth();
-    const { newAddImages, setNewAddImages, deleteAddImage } = useNewAdd();
+    const { newAddImages, setNewAddImages } = useNewAdd();
+    const toast = useToast();
 
     const selectImageFromGalery = async () => {
         const selectedImage = await ImagePicker.launchImageLibraryAsync({
@@ -34,10 +52,34 @@ const NewAddPhotoSelector = () => {
     }
 
     const deleteProductPhotoLocally = async (photoUri: string) => {
-        deleteAddImage(photoUri);
+        const updatedPhotos = usableImages.filter(photos => photos.uri !== photoUri);
+        setUsableImages(updatedPhotos);
+        setNewAddImages(updatedPhotos);
     }
 
-    const handleChangeOrDeleteProduct = async (photoUri: string) => {
+    const getPhotoIdFromUri = (photoUri: string) => {
+        const photoToBeDeleted = usableImages.find(image => image.uri === photoUri);
+        if (!photoToBeDeleted || !photoToBeDeleted.id) return '';
+
+        return photoToBeDeleted.id
+    }
+
+    const deleteProductPhotoLocallyAndFromDatabase = async (photoUri: string) => {
+        const photoId = getPhotoIdFromUri(photoUri);
+
+        deleteProductPhotoLocally(photoUri);
+        if (addImageIdToBeDeleted) addImageIdToBeDeleted(photoId);
+    }
+
+    const deleteProductPhotoLocallyOrInDatabase = (photoUri: string) => {
+        if (existingAddImages) {
+            deleteProductPhotoLocallyAndFromDatabase(photoUri);
+        } else {
+            deleteProductPhotoLocally(photoUri);
+        }
+    }
+
+    const handleDeleteProduct = async (photoUri: string) => {
         return Alert.alert('Deseja excluir essa imagem?', '', [
             {
                 text: 'Cancelar',
@@ -45,7 +87,7 @@ const NewAddPhotoSelector = () => {
             },
             {
                 text: 'Excluir',
-                onPress: () => deleteProductPhotoLocally(photoUri)
+                onPress: () => deleteProductPhotoLocallyOrInDatabase(photoUri)
             }
         ]);
     }
@@ -54,14 +96,45 @@ const NewAddPhotoSelector = () => {
         const photoObject = await selectImageFromGalery();
 
         if (!photoObject) return;
-        setNewAddImages([...newAddImages, photoObject])
+        setUsableImages([...usableImages, photoObject]);
+        setNewAddImages([...usableImages, photoObject]);
+        
+        if (setUpdatedNewImages) setUpdatedNewImages([...updateNewImages, photoObject]);
     }
 
+    useEffect(() => {
+        setIsLoading(true);
+
+        if (existingAddImages) {
+            const standardImagesOjects = existingAddImages.map(image => {
+                const fileExtension = image.path.split('.').pop();
+
+                const imageObject = {
+                    id: image.id,
+                    name: `${user.name.toLowerCase()}.${fileExtension}`,
+                    type: `image/${fileExtension}`,
+                    uri: `${api.defaults.baseURL}/images/${image.path}`
+                }
+
+                return imageObject; 
+            })
+
+            setUsableImages(standardImagesOjects);
+        } else {
+            setUsableImages(newAddImages);
+        }
+
+        setIsLoading(false);
+    }, [])
+
     return (
+    isLoading ?
+        <Loading />
+    :
         <HStack flexWrap = 'wrap' mt = {3}>
-            { newAddImages.length > 0 &&
-                newAddImages.map(photo => (
-                    <Pressable onPress = {() => handleChangeOrDeleteProduct(photo.uri)} key = {photo.uri}>
+            { usableImages.length > 0 &&
+                usableImages.map(photo => (
+                    <Pressable onPress = {() => handleDeleteProduct(photo.uri)} key = {photo.uri}>
                         <Badge position = 'absolute' zIndex = {2} bgColor = 'gray.200' rounded = 'full' p = {0} top = {1} right = {4}>
                             <Icon 
                                 as = {AntDesign}
@@ -83,7 +156,7 @@ const NewAddPhotoSelector = () => {
                 ))
             }
 
-            { newAddImages.length < 3 &&
+            { usableImages.length < 3 &&
                 <Pressable bgColor = 'gray.500' w = {100} h = {100} rounded = 'md' onPress = {handleAddProductImage}>
                     <Center flex = {1}>
                         <Icon 

@@ -50,7 +50,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
     const setPaymentMethodsToAddsDTOStandard = (databaseMethods: DatabasePaymentOptions[]) => {
         return databaseMethods.map(method => method.key);
     }
-    
+
     const setProductImagesToAddsDTOStandard = (databaseImages: DatabaseImages[]) => {
         const productImages = databaseImages.map((image, i) => {
             

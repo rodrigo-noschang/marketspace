@@ -8,10 +8,8 @@ import Loading from "@components/Loading";
 const EditAdd = () => {
     const { onFocusAdd } = useUserAdds();
 
-    console.log('Edit Add | on Focus Add -> ', onFocusAdd);
-
     return (
-        <VStack pt = {45} flex = {1}>
+        <VStack pt = {45} flex = {1} bgColor = 'gray.600'>
 
             <Box px = {6} bgColor = 'gray.600'>
                 <AppHeader 

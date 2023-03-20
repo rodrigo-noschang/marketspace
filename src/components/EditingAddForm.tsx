@@ -1,22 +1,23 @@
 import { useCallback, useState } from 'react';
 import { Alert, Switch } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Box, ScrollView, VStack, Heading, Text, Radio, HStack } from 'native-base';
+import { Box, ScrollView, VStack, Heading, Text, Radio, HStack, useToast } from 'native-base';
 
 import * as yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-
 
 import Input from './Input';
 import Button from './Button';
 import CheckBoxInput from './CheckBoxInput';
 import NewAddPhotoSelector from './NewAddPhotoSelector';
 
-import { NewProductAddDTO, PaymentOptions, NewProductImage } from '@dtos/AddsDTO';
+import api from '@services/api';
+import { AppError } from '@utils/AppError';
 import { useNewAdd } from '@contexts/newAddContext';
-import { AddsRoutesNavigationProps } from '@routes/adds.routes';
 import { DatabaseProductDTO } from '@dtos/ProductDTO';
+import { AddsRoutesNavigationProps } from '@routes/adds.routes';
+import { NewProductAddDTO, PaymentOptions, NewProductImage } from '@dtos/AddsDTO';
 
 type FormInputsProps = {
     name: string, 
@@ -40,15 +41,19 @@ const EditingAddForm = ({ addData }: Props) => {
     const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(addData.payment_methods.map(method => method.key));
     const [controlledPriceInput, setControlledPriceInput] = useState((addData.price/100).toFixed(2).replace('.', ','));
     const [priceInputError, setPriceInputError] = useState('');
+    const [updateNewImages, setUpdatedNewImages] = useState<NewProductImage[]>([]);
+    const [imagesIdToBeDeleted, setImagesIdToBeDeleted] = useState<string[]>([]);
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormInputsProps>({
         resolver: yupResolver(formSchema)
     });
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
-    const { newAddImages, setNewAdd } = useNewAdd();
+    const { setNewAddImages } = useNewAdd(); // Reset this when the add is updated
+    const toast = useToast();
 
     const formatPriceInput = (price: string) => {
+        setPriceInputError('');
         const priceWithoutTheComma = Number(price.replace(',', ''));
 
         const newPrice = (priceWithoutTheComma/100).toFixed(2).replace('.', ',');
@@ -57,7 +62,7 @@ const EditingAddForm = ({ addData }: Props) => {
 
     const adaptFormInputsToApiPattern = (data: FormInputsProps) => {
         data.is_new = data.is_new ? data.is_new : 'new';
-        data.price = data.price * 100;
+        data.price = Number(controlledPriceInput.replace(',', ''));
 
         const newAddData: NewProductAddDTO = {
             ...data, 
@@ -66,10 +71,75 @@ const EditingAddForm = ({ addData }: Props) => {
             is_new: data.is_new === 'new'
         }
         
-        setNewAdd(newAddData);
+        return newAddData;
     }
 
-    const handleCreateNewAdd = (data: FormInputsProps) => {
+    const deleteOldImages = async () => {
+        const config = {
+            data: {
+                productImagesIds: imagesIdToBeDeleted
+            }
+        }
+
+        try {
+            await api.delete('/products/images', config);
+        } catch (error) {
+            const title = error instanceof AppError ? error.message : 'Não foi possível deletar a imagem, tente novamente mais tarde';
+
+            toast.show({
+                title, 
+                placement: 'top',
+                bgColor: 'red.100'
+            })
+        }
+    }
+
+    const updateProductImages = async (imagesForm: FormData) => {
+        try {
+            await api.post('/products/images', imagesForm, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+        } catch (error) {
+            const title = error instanceof AppError ? error.message : 'Não foi possível deletar a imagem, tente novamente mais tarde';
+
+            toast.show({
+                title, 
+                placement: 'top',
+                bgColor: 'red.100'
+            })
+        }
+    }
+
+    const assemblyImagesForm = () => {
+        const updateImagesForm = new FormData();
+
+        updateImagesForm.append('product_id', addData.id);
+        
+        for (const newImage of updateNewImages) {
+            console.log('Imagem Nova -> ', newImage);
+            updateImagesForm.append('images', newImage as any);
+        }
+
+        return updateImagesForm;
+    }
+
+    const updateImages = async () => {
+        if (imagesIdToBeDeleted.length > 0) {
+            await deleteOldImages();
+        }
+
+        if (updateNewImages.length > 0) {
+            const newImagesForm = assemblyImagesForm();
+    
+            await updateProductImages(newImagesForm);
+        }
+
+        setNewAddImages([]);
+    }
+
+    const editAddData = async (data: FormInputsProps) => {
         if (controlledPriceInput === '0,00') {
             setPriceInputError('Defina um preço para seu produto');
             return;
@@ -79,14 +149,17 @@ const EditingAddForm = ({ addData }: Props) => {
             return Alert.alert('Informe as opções de pagamento', 'Selecione ao menos uma opção de pagamento');
         }
 
-        if (newAddImages.length === 0) {
+        if (updateNewImages.length + addData.product_images.length === 0) {
             return Alert.alert('Adicione imagens do seu produto', 'Coloque até 3 imagens para dar um toque a mais no seu anúncio!');
         }
 
+        const addUpdatedData = adaptFormInputsToApiPattern(data);
+        await updateImages();
+        navigator.navigate('appHome');
+    }
 
-        adaptFormInputsToApiPattern(data);
-        
-        navigator.navigate('newAddPreview');
+    const addImageIdToBeDeleted = (imageId: string) => {
+        setImagesIdToBeDeleted([...imagesIdToBeDeleted, imageId]);
     }
 
     return (
@@ -101,7 +174,13 @@ const EditingAddForm = ({ addData }: Props) => {
                         Escolha até 3 imagens para mostrar o quanto o seu produto é incrível!
                     </Text>
 
-                    <NewAddPhotoSelector />
+                    <NewAddPhotoSelector 
+                        existingAddImages = {addData.product_images}
+                        setUpdatedNewImages = {setUpdatedNewImages}
+                        addImageIdToBeDeleted = {addImageIdToBeDeleted}
+                        updateNewImages = {updateNewImages}
+                        productId = {addData.id}
+                    />
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
                         Sobre o produto
@@ -254,7 +333,7 @@ const EditingAddForm = ({ addData }: Props) => {
                         title = 'Avançar'
                         buttonTheme = 'dark'  
                         w = '48%'
-                        onPress = {handleSubmit(handleCreateNewAdd)} 
+                        onPress = {handleSubmit(editAddData)} 
                     />
                 </HStack>
             </ScrollView>
