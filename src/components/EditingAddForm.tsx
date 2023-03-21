@@ -26,12 +26,6 @@ type FormInputsProps = {
     is_new: string
 }
 
-const formSchema = yup.object({
-    name: yup.string().required('Informe o nome do produto'),
-    description: yup.string().required('Forneça uma descrição para o produto'),
-    is_new: yup.string()
-})
-
 type Props = {
     addData: DatabaseProductDTO
 }
@@ -43,6 +37,12 @@ const EditingAddForm = ({ addData }: Props) => {
     const [priceInputError, setPriceInputError] = useState('');
     const [updateNewImages, setUpdatedNewImages] = useState<NewProductImage[]>([]);
     const [imagesIdToBeDeleted, setImagesIdToBeDeleted] = useState<string[]>([]);
+
+    const formSchema = yup.object({
+        name: yup.string().required('Informe o nome do produto').default(addData.name),
+        description: yup.string().required('Forneça uma descrição para o produto').default(addData.description),
+        is_new: yup.string().default(addData.is_new ? 'new' : 'old')
+    })
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormInputsProps>({
         resolver: yupResolver(formSchema)
@@ -94,7 +94,7 @@ const EditingAddForm = ({ addData }: Props) => {
         }
     }
 
-    const updateProductImages = async (imagesForm: FormData) => {
+    const addProductImages = async (imagesForm: FormData) => {
         try {
             await api.post('/products/images', imagesForm, {
                 headers: {
@@ -133,13 +133,28 @@ const EditingAddForm = ({ addData }: Props) => {
         if (updateNewImages.length > 0) {
             const newImagesForm = assemblyImagesForm();
     
-            await updateProductImages(newImagesForm);
+            await addProductImages(newImagesForm);
         }
 
         setNewAddImages([]);
     }
 
-    const editAddData = async (data: FormInputsProps) => {
+    const updateAddData = async (addNewData: NewProductAddDTO) => {
+        try {
+            await api.put(`/products/${addData.id}`, addNewData);
+        } catch (error) {
+            const title = error instanceof AppError ? error.message : 'Não foi possível atualizar o anúncio, tente novamente mais tarde.';
+
+            toast.show({
+                title, 
+                placement: 'top',
+                bgColor: 'red.100'
+            })
+        }
+
+    }
+
+    const editAdd = async (data: FormInputsProps) => {
         if (controlledPriceInput === '0,00') {
             setPriceInputError('Defina um preço para seu produto');
             return;
@@ -155,6 +170,7 @@ const EditingAddForm = ({ addData }: Props) => {
 
         const addUpdatedData = adaptFormInputsToApiPattern(data);
         await updateImages();
+        await updateAddData(addUpdatedData)
         navigator.navigate('appHome');
     }
 
@@ -227,7 +243,7 @@ const EditingAddForm = ({ addData }: Props) => {
                             <Radio.Group
                                 colorScheme = 'indigo'
                                 name = 'productIsNew'
-                                value = {addData.is_new ? 'new' : 'old'}
+                                defaultValue = {addData.is_new ? 'new' : 'old'}
                                 onChange = {onChange}
                             >
                                 <HStack w = '100%' justifyContent = 'space-between' mt = {4}>
@@ -333,7 +349,7 @@ const EditingAddForm = ({ addData }: Props) => {
                         title = 'Avançar'
                         buttonTheme = 'dark'  
                         w = '48%'
-                        onPress = {handleSubmit(editAddData)} 
+                        onPress = {handleSubmit(editAdd)} 
                     />
                 </HStack>
             </ScrollView>

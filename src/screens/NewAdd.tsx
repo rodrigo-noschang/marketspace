@@ -1,10 +1,21 @@
+import { useEffect } from 'react';
 import { VStack, Box } from 'native-base';
 import AppHeader from '@components/AppHeader';
 
 import NewAddForm from '@components/NewAddForm';
+import { useNewAdd } from '@contexts/newAddContext';
 
 const NewAdd = () => {
     
+    const { setNewAddImages } = useNewAdd();
+
+    useEffect(() => {
+
+        return () => {
+            setNewAddImages([]);
+        }
+    }, [])
+
     return (
         <VStack flex = {1}>
 
