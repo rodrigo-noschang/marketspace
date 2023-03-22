@@ -49,7 +49,7 @@ const EditingAddForm = ({ addData }: Props) => {
     });
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
-    const { setNewAddImages } = useNewAdd(); // Reset this when the add is updated
+    const { setNewAddImages } = useNewAdd();
     const toast = useToast();
 
     const formatPriceInput = (price: string) => {
@@ -118,7 +118,6 @@ const EditingAddForm = ({ addData }: Props) => {
         updateImagesForm.append('product_id', addData.id);
         
         for (const newImage of updateNewImages) {
-            console.log('Imagem Nova -> ', newImage);
             updateImagesForm.append('images', newImage as any);
         }
 

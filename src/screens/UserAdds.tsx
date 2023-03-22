@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { VStack, Text, Heading, Select, HStack, Icon } from "native-base";
+import { VStack, Text, Heading, Select, HStack, Icon, ScrollView } from "native-base";
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
 
@@ -40,7 +40,7 @@ const UserAdds = () => {
                 actionIcon = "plus"
             />
 
-            <HStack alignItems = 'center' justifyContent = 'space-between' mt = {4}>
+            <HStack alignItems = 'center' justifyContent = 'space-between' mt = {4} pb = {4}>
                 <Text fontSize = 'sm' fontFamily= 'body' color = 'gray.300'>
                     {userAdds ? userAdds.length : 0} anúncio(s) 
                 </Text>
@@ -74,19 +74,21 @@ const UserAdds = () => {
                 </Select>
             </HStack>
 
-            <HStack flexWrap = 'wrap' justifyContent = 'space-between'>
-                {userAdds ? 
-                    userAdds.map((add, index) => (
-                        <AddProduct 
-                            product = {add} 
-                            key = {`${add.id}-${index}`}
-                            onPress = {() => handleShowAdd(add)}
-                        />
-                    ))
-                :
-                    <Heading fontSize = 'lg' fontFamily = 'heading' color = 'gray.300'> Você ainda não possui anúncios </Heading>
-                }
-            </HStack>
+            <ScrollView flex = {1} showsVerticalScrollIndicator = {false}>
+                <HStack flexWrap = 'wrap' justifyContent = 'space-between' pb = {10}>
+                    {userAdds ? 
+                        userAdds.map((add, index) => (
+                            <AddProduct 
+                                product = {add} 
+                                key = {`${add.id}-${index}`}
+                                onPress = {() => handleShowAdd(add)}
+                            />
+                        ))
+                    :
+                        <Heading fontSize = 'lg' fontFamily = 'heading' color = 'gray.300'> Você ainda não possui anúncios </Heading>
+                    }
+                </HStack>
+            </ScrollView>
         </VStack>
     )
 }
