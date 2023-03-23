@@ -3,9 +3,10 @@ import { HStack, VStack, ScrollView } from "native-base"
 import { useNavigation } from '@react-navigation/native'
 import { useToast } from "native-base";
 
+import api from "@services/api";
 import { AppError } from "@utils/AppError";
 import { useNewAdd } from "@contexts/newAddContext";
-import api from "@services/api";
+import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 import Button from "@components/Button";
 import ProductsInfo from "@components/ProductsInfo";
@@ -21,7 +22,7 @@ const NewAddPreview = () => {
     const navigator = useNavigation<AddsRoutesNavigationProps>();
     const toast = useToast();
 
-    const postProductImages = async (productId: string, ) => {
+    const postProductImages = async (productId: string, product: DatabaseProductDTO) => {
         const productImagesForm = new FormData();
 
         productImagesForm.append('product_id', productId);
@@ -43,7 +44,7 @@ const NewAddPreview = () => {
             const response = await api.post('/products', newAdd);
             const productId = response.data.id;
     
-            postProductImages(productId);
+            postProductImages(productId, response.data);
 
             navigator.navigate('appHome')
         } catch (error) {

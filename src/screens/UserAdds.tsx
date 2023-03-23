@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { VStack, Text, Heading, Select, HStack, Icon, ScrollView } from "native-base";
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
 
-import AddProduct from "@components/AddProduct";
 import AppHeader from "@components/AppHeader";
+import AddProduct from "@components/AddProduct";
 
 import { useUserAdds } from "@contexts/userAddsContext";
 import { AddsRoutesNavigationProps } from "@routes/adds.routes";
@@ -13,10 +13,42 @@ import { DatabaseProductDTO } from "@dtos/ProductDTO";
 
 const UserAdds = () => {
     const { userAdds, fetchUserAdds, putAddOnFocus } = useUserAdds();
+    
+    const [selectedFilterCategory, setSelectedFilterCategory] = useState('all');
+    const [filteredAdds, setFilteredAdds] = useState(userAdds);
 
-    const [selectedAddsFilter, setSelectedAddsFilter] = useState('all');
+    const listedAdds = selectedFilterCategory === 'all' ? userAdds : filteredAdds;
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
+
+    const filterCategories = ['all', 'new', 'used', 'active', 'inactive'];
+    const filterCategoriesLabels = ['Todos', 'Novos', 'Usados', 'Ativados', 'Desativados'];
+
+    const filterNewOrUsedAdds = (condition: string) => {
+        if (!userAdds) return;
+        const isItemNew = condition === 'new';
+
+        const newItems = userAdds?.filter(add => add.is_new === isItemNew);
+        setFilteredAdds(newItems);
+    }
+
+    const filterActiveOrInactiveAdds = (condition: string) => {
+        if (!userAdds) return;
+        const isAddActive = condition === 'active';
+
+        const activatedAdds = userAdds?.filter(add => add.is_active === isAddActive);
+        setFilteredAdds(activatedAdds);
+    }
+
+    const handleFilterAdds = (category: string) => {
+        if (category === 'new' || category === 'used') filterNewOrUsedAdds(category);
+
+        if (category === 'active' || category === 'inactive') filterActiveOrInactiveAdds(category);
+
+        if (category === 'all') setFilteredAdds(userAdds);
+
+        setSelectedFilterCategory(category);
+    }
 
     const handleNewAddRoute = () => {
         navigator.navigate('newAdd');
@@ -30,6 +62,10 @@ const UserAdds = () => {
     
     useFocusEffect(useCallback(() => {
         fetchUserAdds();
+
+        return () => {
+            setSelectedFilterCategory('all');
+        }
     }, []))
 
     return (
@@ -42,11 +78,11 @@ const UserAdds = () => {
 
             <HStack alignItems = 'center' justifyContent = 'space-between' mt = {4} pb = {4}>
                 <Text fontSize = 'sm' fontFamily= 'body' color = 'gray.300'>
-                    {userAdds ? userAdds.length : 0} anúncio(s) 
+                    {listedAdds ? listedAdds.length : 0} anúncio(s) 
                 </Text>
 
                 <Select
-                    selectedValue = {selectedAddsFilter} 
+                    selectedValue = {selectedFilterCategory} 
                     minW = {100} 
                     accessibilityLabel = 'Selecione um anúncio'
                     placeholder = 'Todos'
@@ -61,14 +97,11 @@ const UserAdds = () => {
                             mr = {1}
                         />
                     }
-                    onValueChange = {itemValue => setSelectedAddsFilter(itemValue)}
+                    onValueChange = {itemValue => handleFilterAdds(itemValue)}
                 >
-                    <Select.Item 
-                        label = 'Todos' value = 'all'
-                    />
                     {
-                        userAdds?.map(add => (
-                            <Select.Item label = {add.name} value = {add.id} key = {add.id}/>
+                        filterCategories.map((category, i) => (
+                            <Select.Item label = {filterCategoriesLabels[i]} value = {category} key = {category}/>
                         ))
                     }
                 </Select>
@@ -76,8 +109,8 @@ const UserAdds = () => {
 
             <ScrollView flex = {1} showsVerticalScrollIndicator = {false}>
                 <HStack flexWrap = 'wrap' justifyContent = 'space-between' pb = {10}>
-                    {userAdds ? 
-                        userAdds.map((add, index) => (
+                    {listedAdds?.length !== 0 ? 
+                        listedAdds?.map((add, index) => (
                             <AddProduct 
                                 product = {add} 
                                 key = {`${add.id}-${index}`}
@@ -85,7 +118,9 @@ const UserAdds = () => {
                             />
                         ))
                     :
-                        <Heading fontSize = 'lg' fontFamily = 'heading' color = 'gray.300'> Você ainda não possui anúncios </Heading>
+                        <Heading fontSize = 'lg' fontFamily = 'heading' color = 'gray.300' mt = {10} fontStyle = 'italic'> 
+                            Você ainda não possui anúncios... Pressione no +, no canto superior direito da tela, para criar anúncios e receber ofertas! 
+                        </Heading>
                     }
                 </HStack>
             </ScrollView>

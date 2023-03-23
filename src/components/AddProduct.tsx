@@ -30,7 +30,7 @@ const AddProduct = ({ product, ...rest }: Props) => {
             </Badge>
 
             <VStack position = 'relative'>
-                {!product.is_active && 
+                {product.is_active === false && 
                     <>
                         <Box  w = '100%' h = {24} py = {2}
                             position = 'absolute'
@@ -55,16 +55,16 @@ const AddProduct = ({ product, ...rest }: Props) => {
                     borderColor = 'gray.200'
                 />
 
-                <Text fontSize = 'md' fontFamily = 'body' color = {product.is_active ? 'gray.300' : 'gray.400'} mt = {1}>
+                <Text fontSize = 'md' fontFamily = 'body' color = {product.is_active !== false ? 'gray.300' : 'gray.400'} mt = {1}>
                     {product.name}
                 </Text>
 
                 <HStack alignItems = 'flex-end'>
-                    <Heading fontFamily = 'heading' fontSize = 'sm'  color = {product.is_active ? 'gray.300' : 'gray.400'}>
+                    <Heading fontFamily = 'heading' fontSize = 'sm'  color = {product.is_active !== false ? 'gray.300' : 'gray.400'}>
                         R$   
                     </Heading>
 
-                    <Heading fontFamily = 'heading' fontSize = 'lg' color = {product.is_active ? 'gray.300' : 'gray.400'} ml = {1}>
+                    <Heading fontFamily = 'heading' fontSize = 'lg' color = {product.is_active !== false ? 'gray.300' : 'gray.400'} ml = {1}>
                         {(product.price / 100).toFixed(2).replace('.', ',')}
                     </Heading>
                 </HStack>
