@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, HStack, Text, Icon, Pressable, IPressableProps, Center } from "native-base";
 import { Feather } from '@expo/vector-icons';
 
@@ -31,6 +31,12 @@ const CheckBoxInput = ({ value, label, options, updateOptions, ...rest }: Props)
         updatePaymentOptions();
         changeBoxSelectedState();
     }
+
+    useEffect(() => {
+        if (options.length === 0) {
+            setIsSelected(false);
+        }
+    })
 
     return (
         <Pressable alignSelf = 'flex-start' onPress = {handleChangePaymentOptions} {...rest}> 

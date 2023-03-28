@@ -16,7 +16,7 @@ import { useNewAdd } from "@contexts/newAddContext";
 type Props = {
     existingAddImages?: DatabaseImages[]
     productId?: string,
-    updateNewImages: NewProductImage[],
+    updateNewImages?: NewProductImage[],
     addImageIdToBeDeleted?: (imageId: string) => void,
     setUpdatedNewImages?: (imagesObjects: NewProductImage[]) => void
 }
@@ -99,7 +99,7 @@ const NewAddPhotoSelector = ({ existingAddImages, productId, updateNewImages, ad
         setUsableImages([...usableImages, photoObject]);
         setNewAddImages([...usableImages, photoObject]);
         
-        if (setUpdatedNewImages) setUpdatedNewImages([...updateNewImages, photoObject]);
+        if (setUpdatedNewImages && updateNewImages) setUpdatedNewImages([...updateNewImages, photoObject]);
     }
 
     useEffect(() => {

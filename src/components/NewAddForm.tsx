@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Switch } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Box, ScrollView, VStack, Heading, Text, Radio, HStack } from 'native-base';
 
 import * as yup from 'yup';

@@ -19,7 +19,7 @@ const Button = ({ title, buttonTheme, iconName, iconSize = 4, isLoading, ...rest
             borderRadius = {5}
             disabled = {isLoading}
             _pressed = {{
-                bgColor: 'gray.500'
+                bgColor: buttonTheme === 'light' ? 'gray.400' : 'gray.500'
             }}
             _disabled = {{
                 bgColor: 'gray.400'
