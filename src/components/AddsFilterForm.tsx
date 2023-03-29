@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from 'react-native';
-import { HStack, Heading, Pressable, Icon, VStack, Text, Box } from 'native-base';
+import { HStack, Heading, Pressable, Icon, VStack, Text, Box, useToast, Toast } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 import { PaymentOptions } from '@dtos/AddsDTO';
@@ -15,15 +15,20 @@ type FilterParametersTypes = {
 }
 
 type Props = {
-    setIsModalOpen: (state: boolean) => void
-    fetchFilteredAdds: (filterParameters: FilterParametersTypes) => void
     isLoadingFilteredAdds: boolean
+    currentFilterValues: FilterParametersTypes
+    setIsModalOpen: (state: boolean) => void
+    setFilterObject: (object: FilterParametersTypes) => void
 }
 
-const AddsFilterForm = ({ setIsModalOpen, fetchFilteredAdds, isLoadingFilteredAdds }: Props) => {
-    const [condition, setCondition] = useState<'new' | 'used' | undefined>(undefined);
-    const [acceptsTrade, setAcceptsTrade] = useState(false);
-    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>([]);
+const AddsFilterForm = ({ isLoadingFilteredAdds, currentFilterValues, setIsModalOpen, setFilterObject }: Props) => {
+    const [condition, setCondition] = useState<'new' | 'used' | undefined>(
+        currentFilterValues.is_new === undefined ? undefined : currentFilterValues.is_new === true ? 'new' : 'used'
+    );
+    const [acceptsTrade, setAcceptsTrade] = useState(currentFilterValues.accept_trade);
+    const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(currentFilterValues.payment_methods);
+
+    const toast = useToast();
 
     const assembleFilterObject = () => {
         const filterParameters = {
@@ -31,13 +36,24 @@ const AddsFilterForm = ({ setIsModalOpen, fetchFilteredAdds, isLoadingFilteredAd
             accept_trade: acceptsTrade,
             payment_methods: selectedPaymentOptions
         }
+        return filterParameters;
+    }
 
-        fetchFilteredAdds(filterParameters);
+    const handleSetFilter = () => {
+        const filterParameters = assembleFilterObject();
+        setFilterObject(filterParameters);
+        toast.show({
+            title: 'Filtros definidos com sucesso, clique na lupa para iniciar a busca',
+            placement: 'top',
+            bgColor: 'green.100'
+        })
+        setIsModalOpen(false);
+
     }
 
     const resetFilterParameters = () => {
         setCondition(undefined);
-        setAcceptsTrade(false);
+        setAcceptsTrade(undefined);
         setSelectedPaymentOptions([]);
     }
 
@@ -178,7 +194,7 @@ const AddsFilterForm = ({ setIsModalOpen, fetchFilteredAdds, isLoadingFilteredAd
                     title = 'Aplicar filtros'
                     buttonTheme = 'dark'
                     w = '48%'
-                    onPress = {assembleFilterObject}
+                    onPress = {handleSetFilter}
                     isLoading = {isLoadingFilteredAdds}
                 />
             </HStack>

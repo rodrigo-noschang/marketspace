@@ -52,7 +52,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
     }
 
     const setProductImagesToAddsDTOStandard = (databaseImages: DatabaseImages[]) => {
-        const productImages = databaseImages.map((image, i) => {
+        const productImages = databaseImages.map((image) => {
             
             return {
                 name: '',

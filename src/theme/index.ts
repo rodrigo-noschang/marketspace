@@ -19,6 +19,9 @@ export const THEME = extendTheme({
         },
         red: {
             100: '#EE7979'
+        },
+        green: {
+            100: '#0a0'
         }
     },
     fontSizes: {
