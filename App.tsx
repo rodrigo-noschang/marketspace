@@ -1,5 +1,5 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NativeBaseProvider } from 'native-base';
+import { NativeBaseProvider, StatusBar } from 'native-base';
 import { useFonts, Karla_400Regular, Karla_700Bold } from '@expo-google-fonts/karla';
 
 import { THEME } from './src/theme';
@@ -16,14 +16,16 @@ export default function App() {
 	return (
 		<NativeBaseProvider theme = {THEME}>
 
-
-			<Providers>
-				<GestureHandlerRootView style = {{flex: 1}}>
-					{ fontsLoaded ? 
-						<Routes /> : <Loading />
-					}
-				</GestureHandlerRootView>
-			</Providers>
+			{fontsLoaded ?
+				<Providers>
+					<GestureHandlerRootView style = {{flex: 1}}>
+						<StatusBar backgroundColor = '#EDECEE' barStyle = 'dark-content'/>
+						<Routes />
+					</GestureHandlerRootView>
+				</Providers>
+			:
+				<Loading />
+			}
 		</NativeBaseProvider>
 	);
 }

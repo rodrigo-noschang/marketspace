@@ -11,7 +11,7 @@ import Button from "@components/Button";
 import AppHeader from "@components/AppHeader";
 import ProductsInfo from "@components/ProductsInfo";
 
-const ExistingAddOverview = () => {
+const UsersExistingAddOverview = () => {
     const [isLoadingDeactivate, setIsLoadingDeactivate] = useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 
@@ -110,4 +110,4 @@ const ExistingAddOverview = () => {
 
 }
 
-export default ExistingAddOverview;
+export default UsersExistingAddOverview;

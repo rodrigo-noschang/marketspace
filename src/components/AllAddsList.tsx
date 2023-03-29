@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Modal, Text, VStack, ScrollView, Input, Icon, HStack, Button, useToast, Pressable, Heading } from "native-base";
+import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
+import { Modal, Text, VStack, ScrollView, Input, Icon, HStack, Button, useToast, Pressable, Heading } from "native-base";
 
 import Loading from "./Loading";
 import AddProduct from "./AddProduct";
@@ -10,6 +11,7 @@ import api from "@services/api";
 import { AppError } from "@utils/AppError";
 import { PaymentOptions } from "@dtos/AddsDTO";
 import { DatabaseProductDTO } from "@dtos/ProductDTO";
+import { AddsRoutesNavigationProps } from "@routes/adds.routes";
 
 type FilterParametersTypes = {
     is_new: boolean | undefined,
@@ -33,16 +35,21 @@ const AllAddsList = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const isFilterInactive = filterObject.is_new !== undefined && filterObject.accept_trade !== undefined && filterObject.payment_methods.length === 0;
+    const isFilterActive = filterObject.is_new !== undefined || filterObject.accept_trade !== undefined || filterObject.payment_methods.length > 0;
     const toast = useToast();
+    const navigator = useNavigation<AddsRoutesNavigationProps>();
+
+    const redirectToAddOverview = (add: DatabaseProductDTO) => {
+        navigator.navigate('listingAddOverview', {addId: add.id});
+    }
 
     const fetchFilteredAdds = async () => {
         setIsLoadingFilteredAdds(true);
         const { is_new, accept_trade, payment_methods } = filterObject;
 
-        const queryParam_is_new = `is_new=${is_new}`;
-        const queryParam_accept_trade = `accept_trade=${accept_trade}`;
-        const queryParam_payment_methods = payment_methods.map(method => `payment_method=${method}`).join('&');
+        const queryParam_is_new = is_new !== undefined ? `is_new=${is_new}` : '';
+        const queryParam_accept_trade = accept_trade !== undefined ? `accept_trade=${accept_trade}` : '';
+        const queryParam_payment_methods = payment_methods.length > 0 ? payment_methods.map(method => `payment_method=${method}`).join('&') : '';
         const queryParam_productName = filterProductName.length > 0 ? `query=${filterProductName}` : '';
 
         try {
@@ -59,8 +66,8 @@ const AllAddsList = () => {
                 bgColor: 'red.100'
             })
         } finally {
-            setIsLoadingFilteredAdds(false);
             setIsModalOpen(false);
+            setIsLoadingFilteredAdds(false);
         }
     }
 
@@ -103,44 +110,45 @@ const AllAddsList = () => {
                 Compre produtos variados
             </Text>
 
-            <HStack mt = {4} w = '100%' bgColor = 'gray.700' rounded = 'md' p = {2} alignItems = 'center'>
-                <Input 
-                    placeholder = 'Buscar anúncio'
-                    fontSize = 'lg'
-                    h = {8}
-                    placeholderTextColor = 'gray.400'
-                    flex = {1}
-                    borderWidth = {0}
-                    onChangeText = {setFilterProductName}
-                    _focus = {{
-                        bgColor: 'gray.700',
-                    }}
-                />
-
-                <Pressable onPress = {fetchFilteredAdds}>
-                    <Icon 
-                        as = {Ionicons}
-                        name = 'search'
-                        size = {6}
-                        color = 'gray.100'
-                        ml = {2}
-                    />
-                </Pressable>
-
-                <Text color = 'gray.400' fontSize = 'xl' mx = {1}> | </Text>
-                
-                <Pressable onPress = {() => setIsModalOpen(true)}>
-                    <Icon 
-                        as = {Ionicons}
-                        name = 'options-outline'
-                        size = {6}
-                        color = {isFilterInactive ? 'gray.400' : 'gray.100'}     
-                    />
-                </Pressable>
-            </HStack>
-
             <ScrollView flex = {1} mt = {4} showsVerticalScrollIndicator = {false}>
-                { !filteredList ?
+                <HStack  w = '100%' bgColor = 'gray.700' rounded = 'md' p = {2} alignItems = 'center'>
+                    <Input 
+                        placeholder = 'Buscar anúncio'
+                        fontSize = 'lg'
+                        h = {8}
+                        placeholderTextColor = 'gray.400'
+                        flex = {1}
+                        borderWidth = {0}
+                        onChangeText = {setFilterProductName}
+                        _focus = {{
+                            bgColor: 'gray.700',
+                        }}
+                    />
+
+                    <Pressable onPress = {fetchFilteredAdds}>
+                        <Icon 
+                            as = {Ionicons}
+                            name = 'search'
+                            size = {6}
+                            color = 'gray.100'
+                            ml = {2}
+                        />
+                    </Pressable>
+
+                    <Text color = 'gray.400' fontSize = 'xl' mx = {1}> | </Text>
+                    
+                    <Pressable onPress = {() => setIsModalOpen(true)}>
+                        <Icon 
+                            as = {Ionicons}
+                            name = 'options-outline'
+                            size = {6}
+                            color = {isFilterActive ? 'blue.100' : 'gray.400'}     
+                        />
+                    </Pressable>
+                </HStack>
+
+
+                {isLoadingFilteredAdds ? <Loading bgColor = 'transparent'/> : !filteredList ?
                 <HStack flexWrap = 'wrap' justifyContent = 'space-between' pb = {10}>
                     {
                         allAddsList.map(add => {
@@ -148,6 +156,7 @@ const AllAddsList = () => {
                                 <AddProduct 
                                     product = {add}
                                     key = {add.id}
+                                    onPress = {() => redirectToAddOverview(add)}
                                 />
                             )
                         })
@@ -155,6 +164,7 @@ const AllAddsList = () => {
                 </HStack>
                 
                 :
+                
                 <>
                     <Pressable alignSelf = 'flex-end' onPress = {clearFilteredList}>
                         <Icon 
@@ -173,6 +183,7 @@ const AllAddsList = () => {
                                     <AddProduct 
                                         product = {add}
                                         key = {add.id}
+                                        onPress = {() => redirectToAddOverview(add)}
                                     />
                                 )
                             })
@@ -184,13 +195,13 @@ const AllAddsList = () => {
                     </Text>
                     }
                 </>
+                
                 }
             </ScrollView>
 
             <Modal isOpen = {isModalOpen} onClose = {() => setIsModalOpen(false)} >
                 <Modal.Content marginBottom = {0} marginTop = 'auto' w = '100%' bgColor = 'gray.600' pb = {10}>
                     <AddsFilterForm 
-                        isLoadingFilteredAdds = {isLoadingFilteredAdds}
                         currentFilterValues = {filterObject}
                         setIsModalOpen = {setIsModalOpen}
                         setFilterObject = {setFilterObject}

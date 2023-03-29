@@ -122,9 +122,9 @@ const SignUp = () => {
     }
 
     return (
-        <VStack flex = {1} bgColor = 'gray.600' pt = {12} pb = {20} px = {10}>
-            <ScrollView showsVerticalScrollIndicator = {false}>
-                <Center>
+        <ScrollView flex = {1} bgColor = 'gray.600' pt = {12} px = {10} showsVerticalScrollIndicator = {false}>
+            <VStack flex = {1}>
+                <Center pb = {20}>
                     <Image 
                         source = {Logo}
                         alt = 'Logo image'
@@ -245,8 +245,8 @@ const SignUp = () => {
                         onPress = {handleRedirectToSignIn}
                     />
                 </Center>
-            </ScrollView>
-        </VStack>
+            </VStack>
+        </ScrollView>
     )
 }
 

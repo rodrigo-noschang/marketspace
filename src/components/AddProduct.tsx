@@ -10,7 +10,7 @@ type Props = IPressableProps & {
 const AddProduct = ({ product, ...rest }: Props) => {
 
     return (
-        <Pressable w = '47%' {...rest} mt = {5}>
+        <Pressable w = '47%' mt = {5} {...rest}>
             <Badge 
                 position = 'absolute' 
                 zIndex = {1} 

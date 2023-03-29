@@ -103,23 +103,24 @@ const ProductsInfo = ({ addType, children }: Props) => {
         :
         
         <Box flex = {1}>
-            <Carousel 
-                width = {Dimensions.get('window').width} 
-                height = {350}
-                data = {productUsableImages}
-                scrollAnimationDuration = {1000}
-                loop = {false}
-                renderItem = {({ item }) => (
-                    <Image 
-                        w = '100%'
-                        h = '100%'
-                        source = {{uri: item.uri}}
-                        alt = 'Imagem do produto'
-                    />
-                )}
-            />
-            
             <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6} flex = {1}>
+                <Carousel 
+                    width = {Dimensions.get('window').width} 
+                    height = {275}
+                    data = {productUsableImages}
+                    scrollAnimationDuration = {1000}
+                    loop = {false}
+                    renderItem = {({ item }) => (
+                        <Image 
+                            w = '100%'
+                            h = '100%'
+                            source = {{uri: item.uri}}
+                            alt = 'Imagem do produto'
+                        />
+                    )}
+                />
+            
+            
                 <VStack pb = {6}>
                     <HStack alignItems = 'center' mt = {4}>
                         <Image 

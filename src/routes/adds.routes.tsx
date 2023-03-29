@@ -4,14 +4,18 @@ import AppRoutes from './app.routes';
 import NewAdd from '@screens/NewAdd';
 import EditAdd from '@screens/EditAdd';
 import NewAddPreview from '@screens/NewAddPreview';
-import ExistingAddOverview from '@screens/ExistingAddOverview';
+import ListingAddOverview from '@screens/ListingAddOverview';
+import UsersExistingAddOverview from '@screens/UsersExistingAddOverview';
 
 type AddsRoutes = {
     appHome: undefined,
     newAdd: undefined,
-    newAddPreview: undefined,
-    existingAddOverview: undefined,
     editAdd: undefined
+    newAddPreview: undefined,
+    listingAddOverview: {
+        addId: string
+    },
+    usersExistingAddOverview: undefined,
 }
 
 export type AddsRoutesNavigationProps = NativeStackNavigationProp<AddsRoutes>;
@@ -39,13 +43,18 @@ const AddsRoutes = () => {
             />
 
             <Screen 
-                name = 'existingAddOverview'
-                component = {ExistingAddOverview}
+                name = 'usersExistingAddOverview'
+                component = {UsersExistingAddOverview}
             />
 
             <Screen 
                 name = 'editAdd'
                 component = {EditAdd}
+            />
+
+            <Screen 
+                name = 'listingAddOverview'
+                component = {ListingAddOverview}
             />
 
         </Navigator>

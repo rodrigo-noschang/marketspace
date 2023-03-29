@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from 'react-native';
-import { HStack, Heading, Pressable, Icon, VStack, Text, Box, useToast, Toast } from 'native-base';
+import { HStack, Heading, Pressable, Icon, VStack, Text, Box } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 import { PaymentOptions } from '@dtos/AddsDTO';
@@ -15,20 +15,17 @@ type FilterParametersTypes = {
 }
 
 type Props = {
-    isLoadingFilteredAdds: boolean
     currentFilterValues: FilterParametersTypes
     setIsModalOpen: (state: boolean) => void
     setFilterObject: (object: FilterParametersTypes) => void
 }
 
-const AddsFilterForm = ({ isLoadingFilteredAdds, currentFilterValues, setIsModalOpen, setFilterObject }: Props) => {
+const AddsFilterForm = ({ currentFilterValues, setIsModalOpen, setFilterObject }: Props) => {
     const [condition, setCondition] = useState<'new' | 'used' | undefined>(
         currentFilterValues.is_new === undefined ? undefined : currentFilterValues.is_new === true ? 'new' : 'used'
     );
     const [acceptsTrade, setAcceptsTrade] = useState(currentFilterValues.accept_trade);
     const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(currentFilterValues.payment_methods);
-
-    const toast = useToast();
 
     const assembleFilterObject = () => {
         const filterParameters = {
@@ -42,16 +39,19 @@ const AddsFilterForm = ({ isLoadingFilteredAdds, currentFilterValues, setIsModal
     const handleSetFilter = () => {
         const filterParameters = assembleFilterObject();
         setFilterObject(filterParameters);
-        toast.show({
-            title: 'Filtros definidos com sucesso, clique na lupa para iniciar a busca',
-            placement: 'top',
-            bgColor: 'green.100'
-        })
-        setIsModalOpen(false);
 
+        setIsModalOpen(false);
     }
 
     const resetFilterParameters = () => {
+        const resetedFilterObject = {
+            is_new: undefined,
+            accept_trade: undefined,
+            payment_methods: []
+        }
+
+        setFilterObject(resetedFilterObject);
+
         setCondition(undefined);
         setAcceptsTrade(undefined);
         setSelectedPaymentOptions([]);
@@ -195,7 +195,6 @@ const AddsFilterForm = ({ isLoadingFilteredAdds, currentFilterValues, setIsModal
                     buttonTheme = 'dark'
                     w = '48%'
                     onPress = {handleSetFilter}
-                    isLoading = {isLoadingFilteredAdds}
                 />
             </HStack>
         </VStack>

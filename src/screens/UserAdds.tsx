@@ -57,7 +57,7 @@ const UserAdds = () => {
     const handleShowAdd = (add: DatabaseProductDTO) => {
         putAddOnFocus(add.id);
 
-        navigator.navigate('existingAddOverview');
+        navigator.navigate('usersExistingAddOverview');
     }
     
     useFocusEffect(useCallback(() => {
@@ -69,7 +69,7 @@ const UserAdds = () => {
     }, []))
 
     return (
-        <VStack pt = {45} px = {6} flex = {1}>
+        <VStack pt = {6} px = {6} flex = {1}>
             <AppHeader 
                 title = 'Meus anúncios'
                 action = {handleNewAddRoute}

@@ -61,7 +61,7 @@ const SignIn = () => {
 
     return (
         <VStack flex = {1}>
-            <ScrollView flex = {1} showsVerticalScrollIndicator = {false}>
+            <ScrollView flex = {1} showsVerticalScrollIndicator = {false} >
                 <Center bgColor = 'gray.600' py = {20} px = {10} borderBottomLeftRadius = {20} borderBottomRightRadius = {20}>
                     <Image 
                         source = {Logo}
@@ -127,7 +127,7 @@ const SignIn = () => {
                     />
                 </Center>
 
-                <Center px = {10}>
+                <Center px = {10} pb = {10}>
                     <Heading mt = {12} fontSize = 'md' fontFamily = 'heading' color = 'gray.400'>
                         Ainda não tem acesso?
                     </Heading>
