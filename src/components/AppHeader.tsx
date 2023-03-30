@@ -6,9 +6,10 @@ import { useNavigation } from '@react-navigation/native'
 type Props = {
     title: string
     returnable?: boolean
-    action?: () => void
     actionIcon?: 'plus' | 'edit',
     warningMessage?: string
+
+    action?: () => void
 }
 
 const AppHeader = ({ title, returnable = false, action, actionIcon, warningMessage }: Props) => {

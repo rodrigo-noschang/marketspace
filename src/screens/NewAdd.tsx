@@ -19,7 +19,7 @@ const NewAdd = () => {
     return (
         <VStack flex = {1}>
 
-            <Box pt = {45} px = {6} bgColor = 'gray.600'>
+            <Box pt = {5} px = {6} bgColor = 'gray.600'>
                 <AppHeader 
                     title = 'Criar anúncio'
                     returnable

@@ -64,6 +64,8 @@ export const UserAddsContexProvider = ({ children }: UserAddsProviderProps) => {
         } else {
             setUserAdds([product])
         }
+
+        console.log('Inser new add no UserAddsContext -> ', userAdds);
     }
 
     // const removeAddFromState = (addId: string) => {

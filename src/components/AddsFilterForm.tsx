@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from 'react-native';
-import { HStack, Heading, Pressable, Icon, VStack, Text, Box } from 'native-base';
+import { HStack, Heading, Pressable, Icon, VStack, Text, Box, ScrollView } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 import { PaymentOptions } from '@dtos/AddsDTO';
@@ -58,146 +58,148 @@ const AddsFilterForm = ({ currentFilterValues, setIsModalOpen, setFilterObject }
     }
 
     return (
-        <VStack  px = {6} pt = {10}>
-            <HStack alignItems = 'center' justifyContent = 'space-between'>
-                <Heading fontFamily = 'heading' fontSize = 'xl' color = 'gray.100'> 
-                    Filtrar anúncios 
-                </Heading>
+        <ScrollView showsVerticalScrollIndicator = {false} px = {6}>
+            <VStack  py = {10}>
+                <HStack alignItems = 'center' justifyContent = 'space-between'>
+                    <Heading fontFamily = 'heading' fontSize = 'xl' color = 'gray.100'> 
+                        Filtrar anúncios 
+                    </Heading>
 
-                <Pressable onPress = {() => setIsModalOpen(false)}>
-                    <Icon 
-                        as = {Ionicons}
-                        name = 'close'
-                        size = {7}
-                        color = 'gray.400'
-                    />
-                </Pressable>
-            </HStack>
-
-            <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {6}> 
-                Condição 
-            </Heading>
-
-            <HStack mt = {3}>
-                <Pressable onPress = {() => setCondition(!condition ? 'new' : undefined)}
-                    bgColor = {condition === 'new' ? 'blue.200' : 'gray.500'} 
-                    px = {3} py = {1} rounded = 'full'
-                >
-                    <HStack alignItems = 'center'>
-                        <Text fontSize = 'sm' fontFamily = 'body' color = {condition === 'new' ? 'gray.700' : 'gray.100'}> 
-                            NOVO 
-                        </Text>
-
-                        { condition === 'new' && 
+                    <Pressable onPress = {() => setIsModalOpen(false)}>
                         <Icon 
                             as = {Ionicons}
                             name = 'close'
-                            size = {3}
-                            color = 'gray.300'
-                            bgColor = 'gray.700'
-                            rounded = 'full'
-                            ml = {2}
-                        />}
-                    </HStack>
-                </Pressable>
+                            size = {7}
+                            color = 'gray.400'
+                        />
+                    </Pressable>
+                </HStack>
 
-                <Pressable onPress = {() => setCondition(!condition ? 'used' : undefined)}
-                    bgColor = {condition === 'used' ? 'blue.200' : 'gray.500'} 
-                    px = {3} py = {1} rounded = 'full' ml = {3}
-                >
-                    <HStack alignItems = 'center'>
-                        <Text fontSize = 'sm' fontFamily = 'body' color = {condition === 'used' ? 'gray.700' : 'gray.100'}> 
-                            USADO
-                        </Text>
+                <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {6}> 
+                    Condição 
+                </Heading>
 
-                        { condition === 'used' && <Icon 
-                            as = {Ionicons}
-                            name = 'close'
-                            size = {3}
-                            color = 'gray.300'
-                            bgColor = 'gray.700'
-                            rounded = 'full'
-                            ml = {2}
-                        />}
-                    </HStack>
-                </Pressable>
+                <HStack mt = {3}>
+                    <Pressable onPress = {() => setCondition(!condition ? 'new' : undefined)}
+                        bgColor = {condition === 'new' ? 'blue.200' : 'gray.500'} 
+                        px = {3} py = {1} rounded = 'full'
+                    >
+                        <HStack alignItems = 'center'>
+                            <Text fontSize = 'sm' fontFamily = 'body' color = {condition === 'new' ? 'gray.700' : 'gray.100'}> 
+                                NOVO 
+                            </Text>
 
-            </HStack>
+                            { condition === 'new' && 
+                            <Icon 
+                                as = {Ionicons}
+                                name = 'close'
+                                size = {3}
+                                color = 'gray.300'
+                                bgColor = 'gray.700'
+                                rounded = 'full'
+                                ml = {2}
+                            />}
+                        </HStack>
+                    </Pressable>
 
-            <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {6}>
-                Aceita troca?
-            </Heading>
+                    <Pressable onPress = {() => setCondition(!condition ? 'used' : undefined)}
+                        bgColor = {condition === 'used' ? 'blue.200' : 'gray.500'} 
+                        px = {3} py = {1} rounded = 'full' ml = {3}
+                    >
+                        <HStack alignItems = 'center'>
+                            <Text fontSize = 'sm' fontFamily = 'body' color = {condition === 'used' ? 'gray.700' : 'gray.100'}> 
+                                USADO
+                            </Text>
 
-            <Box alignItems = 'flex-start'>
-                <Switch 
-                    trackColor = {{false: '#D9D8DA', true: '#D9D8DA'}}
-                    thumbColor = {acceptsTrade ? '#647AC7' : '#F7F7F8'}
-                    value = {acceptsTrade}
-                    onValueChange = {() => setAcceptsTrade(!acceptsTrade)}
-                />
-            </Box>
+                            { condition === 'used' && <Icon 
+                                as = {Ionicons}
+                                name = 'close'
+                                size = {3}
+                                color = 'gray.300'
+                                bgColor = 'gray.700'
+                                rounded = 'full'
+                                ml = {2}
+                            />}
+                        </HStack>
+                    </Pressable>
 
-            <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {3} mb = {4}>
-                Meios de pagamento aceitos
-            </Heading>
+                </HStack>
 
-            <CheckBoxInput 
-                value = 'boleto'
-                label = 'Boleto'
-                options = {selectedPaymentOptions}
-                updateOptions = {setSelectedPaymentOptions}
-                mb = {1}
-                
-            />
+                <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {6}>
+                    Aceita troca?
+                </Heading>
 
-            <CheckBoxInput 
-                value = 'pix'
-                label = 'Pix'
-                options = {selectedPaymentOptions}
-                updateOptions = {setSelectedPaymentOptions}
-                mb = {1}
-            />
+                <Box alignItems = 'flex-start'>
+                    <Switch 
+                        trackColor = {{false: '#D9D8DA', true: '#D9D8DA'}}
+                        thumbColor = {acceptsTrade ? '#647AC7' : '#F7F7F8'}
+                        value = {acceptsTrade}
+                        onValueChange = {() => setAcceptsTrade(!acceptsTrade)}
+                    />
+                </Box>
 
-            <CheckBoxInput 
-                value = 'cash'
-                label = 'Dinheiro'
-                options = {selectedPaymentOptions}
-                updateOptions = {setSelectedPaymentOptions}
-                mb = {1}
-            />
+                <Heading fontFamily = 'heading' fontSize = 'md' color = 'gray.100' mt = {3} mb = {4}>
+                    Meios de pagamento aceitos
+                </Heading>
 
-            <CheckBoxInput 
-                value = 'card'
-                label = 'Cartão de Crédito'
-                options = {selectedPaymentOptions}
-                updateOptions = {setSelectedPaymentOptions}
-                mb = {1}
-            />
-
-            <CheckBoxInput 
-                value = 'deposit'
-                label = 'Depósito Bancário'
-                options = {selectedPaymentOptions}
-                updateOptions = {setSelectedPaymentOptions}
-                mb = {1}
-            />
-
-            <HStack mt = {9} justifyContent = 'space-between'>
-                <Button 
-                    title = 'Resetar filtros'
-                    buttonTheme = 'light'
-                    w = '48%'
-                    onPress = {resetFilterParameters}
+                <CheckBoxInput 
+                    value = 'boleto'
+                    label = 'Boleto'
+                    options = {selectedPaymentOptions}
+                    updateOptions = {setSelectedPaymentOptions}
+                    mb = {1}
+                    
                 />
 
-                <Button 
-                    title = 'Aplicar filtros'
-                    buttonTheme = 'dark'
-                    w = '48%'
-                    onPress = {handleSetFilter}
+                <CheckBoxInput 
+                    value = 'pix'
+                    label = 'Pix'
+                    options = {selectedPaymentOptions}
+                    updateOptions = {setSelectedPaymentOptions}
+                    mb = {1}
                 />
-            </HStack>
-        </VStack>
+
+                <CheckBoxInput 
+                    value = 'cash'
+                    label = 'Dinheiro'
+                    options = {selectedPaymentOptions}
+                    updateOptions = {setSelectedPaymentOptions}
+                    mb = {1}
+                />
+
+                <CheckBoxInput 
+                    value = 'card'
+                    label = 'Cartão de Crédito'
+                    options = {selectedPaymentOptions}
+                    updateOptions = {setSelectedPaymentOptions}
+                    mb = {1}
+                />
+
+                <CheckBoxInput 
+                    value = 'deposit'
+                    label = 'Depósito Bancário'
+                    options = {selectedPaymentOptions}
+                    updateOptions = {setSelectedPaymentOptions}
+                    mb = {1}
+                />
+
+                <HStack mt = {9} justifyContent = 'space-between'>
+                    <Button 
+                        title = 'Resetar filtros'
+                        buttonTheme = 'light'
+                        w = '48%'
+                        onPress = {resetFilterParameters}
+                    />
+
+                    <Button 
+                        title = 'Aplicar filtros'
+                        buttonTheme = 'dark'
+                        w = '48%'
+                        onPress = {handleSetFilter}
+                    />
+                </HStack>
+            </VStack>
+        </ScrollView>
     )
 }
 

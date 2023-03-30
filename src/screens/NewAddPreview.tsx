@@ -7,6 +7,7 @@ import api from "@services/api";
 import { AppError } from "@utils/AppError";
 import { useNewAdd } from "@contexts/newAddContext";
 import { DatabaseProductDTO } from "@dtos/ProductDTO";
+import { useUserAdds } from "@contexts/userAddsContext";
 
 import Button from "@components/Button";
 import ProductsInfo from "@components/ProductsInfo";
@@ -18,6 +19,7 @@ const NewAddPreview = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { newAdd, newAddImages } = useNewAdd();
+    const { insertNewAdd } = useUserAdds();
 
     const navigator = useNavigation<AddsRoutesNavigationProps>();
     const toast = useToast();
@@ -31,11 +33,14 @@ const NewAddPreview = () => {
             productImagesForm.append('images', image as any)
         }
 
-        await api.post('/products/images', productImagesForm, {
+        const response = await api.post('/products/images', productImagesForm, {
             headers: {
                 "Content-Type": 'multipart/form-data'
             }
         })
+
+        product.product_images = response.data;
+        return product;
     }
     
     const handleCreateAdd = async () => {
@@ -44,7 +49,8 @@ const NewAddPreview = () => {
             const response = await api.post('/products', newAdd);
             const productId = response.data.id;
     
-            postProductImages(productId, response.data);
+            const productWithImages = await postProductImages(productId, response.data);
+            insertNewAdd(productWithImages);
 
             navigator.navigate('appHome')
         } catch (error) {

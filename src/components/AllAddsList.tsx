@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useNavigation } from '@react-navigation/native'
+import { useState, useCallback } from "react";
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, Text, VStack, ScrollView, Input, Icon, HStack, Button, useToast, Pressable, Heading } from "native-base";
+import { Modal, Text, VStack, ScrollView, Input, Icon, HStack, useToast, Pressable, Box } from "native-base";
 
 import Loading from "./Loading";
 import AddProduct from "./AddProduct";
@@ -95,13 +95,13 @@ const AllAddsList = () => {
         }
     }
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
         fetchAllAdds();
 
-    }, [])
+    }, []))
 
     return (
-        isLoadingAdds ? <Loading /> :
+        isLoadingAdds ? <Loading />  :
 
         allAddsList.length > 0 ?
 
@@ -111,7 +111,7 @@ const AllAddsList = () => {
             </Text>
 
             <ScrollView flex = {1} mt = {4} showsVerticalScrollIndicator = {false}>
-                <HStack  w = '100%' bgColor = 'gray.700' rounded = 'md' p = {2} alignItems = 'center'>
+                <HStack  w = '100%' bgColor = 'gray.700' rounded = 'md' p = {2} alignItems = 'center' mb = {5}>
                     <Input 
                         placeholder = 'Buscar anúncio'
                         fontSize = 'lg'

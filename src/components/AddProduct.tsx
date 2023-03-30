@@ -49,7 +49,7 @@ const AddProduct = ({ product, ...rest }: Props) => {
                 }
                 <Image 
                     h = {24}
-                    source = {{uri: `${api.defaults.baseURL}/images/${product.product_images[0].path}`}}
+                    source = {{uri: `${api.defaults.baseURL}/images/${product.product_images[0]?.path}`}}
                     alt = 'Product image'
                     rounded = 'md'
                     borderColor = 'gray.200'

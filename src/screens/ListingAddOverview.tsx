@@ -3,7 +3,7 @@ import { Dimensions, Linking } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
-import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box, Pressable } from 'native-base';
+import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box, Pressable, StatusBar } from 'native-base';
 
 import Button from '@components/Button';
 import Loading from '@components/Loading';
@@ -43,8 +43,7 @@ const ListingAddOverview = () => {
 
     const handleContactProductOwner = useCallback(async () => {
         try {
-            const productOwnerWhatsAppURL = `https://wa.me/${5544999275408}`
-            // const productOwnerWhatsAppURL = `https://wa.me/${addData.user.tel}`
+            const productOwnerWhatsAppURL = `https://wa.me/${addData.user.tel}`
             
             const supported = await Linking.canOpenURL(productOwnerWhatsAppURL);
     
@@ -79,7 +78,11 @@ const ListingAddOverview = () => {
     return (
         isLoadingData ? <Loading /> :
 
-        <VStack pt = {10} flex = {1}>
+        <VStack pt = {8} flex = {1}>
+            <StatusBar 
+                translucent = {true}
+                backgroundColor = 'transparent'
+            />
             <Box px = {6}>
                 <AppHeader 
                     returnable

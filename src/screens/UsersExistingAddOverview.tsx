@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, useToast } from "native-base";
+import { Box, StatusBar, useToast } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
 import api from "@services/api";
@@ -75,7 +75,12 @@ const UsersExistingAddOverview = () => {
     }
 
     return (
-            <Box pt = {45} flex = {1}>
+            <Box pt = {10} flex = {1}>
+                <StatusBar 
+                    backgroundColor = 'transparent'
+                    translucent = {true}
+                />
+
                 <Box px = {6}>
                     <AppHeader
                         title = ''
