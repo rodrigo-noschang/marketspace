@@ -97,9 +97,7 @@ const NewAddForm = () => {
                         Escolha até 3 imagens para mostrar o quanto o seu produto é incrível!
                     </Text>
 
-                    <NewAddPhotoSelector 
-                        
-                    />
+                    <NewAddPhotoSelector />
 
                     <Heading fontSize = 'lg' color = 'gray.200' fontFamily = 'heading' mt = {6}>
                         Sobre o produto

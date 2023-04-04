@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { HStack, Pressable, Image, Icon, Badge, Center, useToast } from "native-base"
+import { HStack, Pressable, Image, Icon, Badge, Center } from "native-base"
 
 import Loading from "./Loading";
 
@@ -27,7 +27,6 @@ const NewAddPhotoSelector = ({ existingAddImages, productId, updateNewImages, ad
     
     const { user } = useAuth();
     const { newAddImages, setNewAddImages } = useNewAdd();
-    const toast = useToast();
 
     const selectImageFromGalery = async () => {
         const selectedImage = await ImagePicker.launchImageLibraryAsync({
@@ -43,7 +42,7 @@ const NewAddPhotoSelector = ({ existingAddImages, productId, updateNewImages, ad
         const fileExtension = fileUri.split('.').pop();
 
         const fileObject = {
-            name: `${user.name.toLowerCase()}.${fileExtension}`,
+            name: `${user.name.toLowerCase().split(' ').join('-')}.${fileExtension}`,
             type: `image/${fileExtension}`,
             uri: fileUri
         }

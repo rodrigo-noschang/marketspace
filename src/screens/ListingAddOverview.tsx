@@ -5,9 +5,9 @@ import Carousel from 'react-native-reanimated-carousel';
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box, Pressable, StatusBar } from 'native-base';
 
-import Button from '@components/Button';
 import Loading from '@components/Loading';
 import AppHeader from '@components/AppHeader';
+import FullScreenImageModal from '@components/FullScreenImageModal';
 
 import api from '@services/api';
 import { DatabaseProductDTO } from '@dtos/ProductDTO';
@@ -79,6 +79,7 @@ const ListingAddOverview = () => {
         isLoadingData ? <Loading /> :
 
         <VStack pt = {8} flex = {1}>
+            <FullScreenImageModal imagePath = {addData.product_images[1].path} />
             <StatusBar 
                 translucent = {true}
                 backgroundColor = 'transparent'
@@ -107,7 +108,6 @@ const ListingAddOverview = () => {
                             />
                         )}
                     />
-            
                 
                     <VStack pb = {6} px = {6}>
                         <HStack alignItems = 'center' mt = {4}>
