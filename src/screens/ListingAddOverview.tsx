@@ -29,6 +29,8 @@ type ProductFullInfo = DatabaseProductDTO & {
 const ListingAddOverview = () => {
     const [addData, setAddData] = useState<ProductFullInfo>({} as ProductFullInfo);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [isShowingFullScreenImage, setIsShowingFullScreenImage] = useState(false);
+    const [fullSCreenImagePath, setFullScreenImagePath] = useState('');
 
     const route = useRoute();
     const { addId } = route.params as RouteParams;
@@ -39,6 +41,11 @@ const ListingAddOverview = () => {
         deposit: 'bank-outline',
         cash: 'cash',
         card: 'credit-card-outline'
+    }
+
+    const handleShowFullScreenImage = (imagePath: string) => {
+        setFullScreenImagePath(imagePath);
+        setIsShowingFullScreenImage(true);
     }
 
     const handleContactProductOwner = useCallback(async () => {
@@ -79,7 +86,13 @@ const ListingAddOverview = () => {
         isLoadingData ? <Loading /> :
 
         <VStack pt = {8} flex = {1}>
-            <FullScreenImageModal imagePath = {addData.product_images[1].path} />
+            { isShowingFullScreenImage &&
+                <FullScreenImageModal 
+                    imagePath = {fullSCreenImagePath} 
+                    setIsImageModalOpen = {setIsShowingFullScreenImage}
+                />
+            }
+
             <StatusBar 
                 translucent = {true}
                 backgroundColor = 'transparent'
@@ -100,12 +113,14 @@ const ListingAddOverview = () => {
                         scrollAnimationDuration = {1000}
                         loop = {false}
                         renderItem = {({ item }) => (
-                            <Image 
-                                w = '100%'
-                                h = '100%'
-                                source = {{uri: `${api.defaults.baseURL}/images/${item.path}`}}
-                                alt = 'Imagem do produto'
-                            />
+                            <Pressable onPress = {() => handleShowFullScreenImage(item.path)}>
+                                <Image 
+                                    w = '100%'
+                                    h = '100%'
+                                    source = {{uri: `${api.defaults.baseURL}/images/${item.path}`}}
+                                    alt = 'Imagem do produto'
+                                />
+                            </Pressable>
                         )}
                     />
                 

@@ -1,16 +1,17 @@
 import { useEffect, useState, useRef, createRef } from 'react';
-import { Image as RNImage, Animated, Dimensions } from 'react-native';
-import { Box, Pressable, Icon} from 'native-base';
+import { Image, Animated, Dimensions, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-
-import api from '@services/api';
+import { Box, Pressable, Icon, StatusBar} from 'native-base';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 
+import api from '@services/api';
+
 type Props = {
-    imagePath: string
+    imagePath: string,
+    setIsImageModalOpen: (isOpen: boolean) => void
 }
 
-const FullScreenImageModal = ({ imagePath }: Props) => {
+const FullScreenImageModal = ({ imagePath, setIsImageModalOpen }: Props) => {
     const [panEnabled, setPanEnabled] = useState(false);
     const [imageWidth, setImageWidth] = useState(0);
     const [imageHeight, setImageHeight] = useState(0);
@@ -30,8 +31,11 @@ const FullScreenImageModal = ({ imagePath }: Props) => {
         nativeEvent: {
             translationX: translateX,
             translationY: translateY
-        }
-    }], {useNativeDriver: true})
+        },
+    }], {
+        listener: e => console.log('Evento aqui -> ', e.nativeEvent),
+        useNativeDriver: true,
+    })
 
     const handlePinchStateChange = ({ nativeEvent }: any) => {
         // enabled pan only after pinch-zoom
@@ -73,10 +77,10 @@ const FullScreenImageModal = ({ imagePath }: Props) => {
     }
 
     const getImageSize = () => {
-        RNImage.getSize(`${api.defaults.baseURL}/images/${imagePath}`, 
-        (w, h) => resizeImage(w, h), 
-        () => {
-            console.log('Erro ao ler a imagem')
+        Image.getSize(`${api.defaults.baseURL}/images/${imagePath}`, 
+            (w, h) => resizeImage(w, h), 
+            () => {
+                console.log('Erro ao ler a imagem')
         })
     }
 
@@ -85,7 +89,14 @@ const FullScreenImageModal = ({ imagePath }: Props) => {
     }, [])
 
     return (
-        <Box position = 'absolute' top = {0} left = {0} w = '100%' h = '110%' bgColor = 'gray.200' zIndex = {5}>
+        <View style = {{
+            marginTop: -40,
+            width: '100%', 
+            height: '110%',
+            backgroundColor: '#1A181B',
+            zIndex: 5
+        }}>
+            <StatusBar hidden = {true} backgroundColor = '#1A181B'/>
             <PanGestureHandler
                 onGestureEvent = {onPanEvent}
                 ref = {panRef}
@@ -95,17 +106,19 @@ const FullScreenImageModal = ({ imagePath }: Props) => {
                 shouldCancelWhenOutside
             >
                 <Animated.View>
-                    {/* <Icon
-                        as = {AntDesign}
-                        name = 'close'
-                        size = {6}
-                        color = 'gray.600'
-                        alignSelf = 'flex-end'
-                        mt = {4}
-                        mr = {4}
-                    /> */}
+                    <Pressable onPress = {() => setIsImageModalOpen(false)} >
+                        <Icon
+                            as = {AntDesign}
+                            name = 'close'
+                            size = {6}
+                            color = 'gray.600'
+                            alignSelf = 'flex-end'
+                            mt = {8}
+                            mr = {4}
+                            mb = {24}
+                        />
+                    </Pressable>
 
-                    {/* <Animated.View> */}
                         <PinchGestureHandler
                             ref = {pinchRef}
                             onGestureEvent = {onPinchEvent}
@@ -122,10 +135,9 @@ const FullScreenImageModal = ({ imagePath }: Props) => {
                                 resizeMode = 'contain'
                             />
                         </PinchGestureHandler>
-                    {/* </Animated.View> */}
                 </Animated.View>
             </PanGestureHandler>
-        </Box>
+        </View>
     )
 }
 

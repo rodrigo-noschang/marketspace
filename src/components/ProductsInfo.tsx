@@ -1,14 +1,14 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
-import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box } from 'native-base';
+import { VStack, HStack, Image, Text, Badge, Heading, Icon, ScrollView, Box, Pressable } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Carousel from 'react-native-reanimated-carousel';
 
 import Loading from './Loading';
 
-import { NewProductImage, PaymentOptions } from '@dtos/AddsDTO';
+import { NewProductImage } from '@dtos/AddsDTO';
 import { NewProductAddDTO } from '@dtos/AddsDTO';
-import { DatabaseImages, DatabasePaymentOptions, DatabaseProductDTO } from '@dtos/ProductDTO';
+import { DatabaseImages, DatabasePaymentOptions } from '@dtos/ProductDTO';
 
 import api from '@services/api';
 import { useAuth } from '@contexts/authContext';
@@ -53,7 +53,6 @@ const ProductsInfo = ({ addType, children }: Props) => {
 
     const setProductImagesToAddsDTOStandard = (databaseImages: DatabaseImages[]) => {
         const productImages = databaseImages.map((image) => {
-            
             return {
                 name: '',
                 type: '',
@@ -103,6 +102,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
         :
         
         <Box flex = {1}>
+
             <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6} flex = {1}>
                 <Carousel 
                     width = {Dimensions.get('window').width} 
