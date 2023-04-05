@@ -85,7 +85,7 @@ const ListingAddOverview = () => {
     return (
         isLoadingData ? <Loading /> :
 
-        <VStack pt = {8} flex = {1}>
+        <VStack pt = {8} flex = {1} >
             { isShowingFullScreenImage &&
                 <FullScreenImageModal 
                     imagePath = {fullSCreenImagePath} 
@@ -94,7 +94,7 @@ const ListingAddOverview = () => {
             }
 
             <StatusBar 
-                translucent = {true}
+                
                 backgroundColor = 'transparent'
             />
             <Box px = {6}>
@@ -124,7 +124,7 @@ const ListingAddOverview = () => {
                         )}
                     />
                 
-                    <VStack pb = {6} px = {6}>
+                    <VStack pb = {6} px = {6}flex = {1}>
                         <HStack alignItems = 'center' mt = {4}>
                             <Image 
                                 source = {{uri: `${api.defaults.baseURL}/images/${addData.user.avatar}`}}

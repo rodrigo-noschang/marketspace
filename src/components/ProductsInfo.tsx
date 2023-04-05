@@ -103,7 +103,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
         
         <Box flex = {1}>
 
-            <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} px = {6} flex = {1}>
+            <ScrollView bgColor = 'gray.600' showsVerticalScrollIndicator = {false} flex = {1}>
                 <Carousel 
                     width = {Dimensions.get('window').width} 
                     height = {275}
@@ -121,7 +121,7 @@ const ProductsInfo = ({ addType, children }: Props) => {
                 />
             
             
-                <VStack pb = {6}>
+                <VStack pb = {6} px = {6}>
                     <HStack alignItems = 'center' mt = {4}>
                         <Image 
                             source = {{uri: `${api.defaults.baseURL}/images/${user.avatar}`}}

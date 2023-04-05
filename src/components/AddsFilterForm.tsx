@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from 'react-native';
-import { HStack, Heading, Pressable, Icon, VStack, Text, Box, ScrollView } from 'native-base';
+import { HStack, Heading, Pressable, Icon, VStack, Text, Box, ScrollView, useToast } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 import { PaymentOptions } from '@dtos/AddsDTO';
@@ -27,18 +27,31 @@ const AddsFilterForm = ({ currentFilterValues, setIsModalOpen, setFilterObject }
     const [acceptsTrade, setAcceptsTrade] = useState(currentFilterValues.accept_trade);
     const [selectedPaymentOptions, setSelectedPaymentOptions] = useState<PaymentOptions[]>(currentFilterValues.payment_methods);
 
+    const toast = useToast();
+
     const assembleFilterObject = () => {
         const filterParameters = {
             is_new: condition === 'new' ? true : condition === 'used' ? false : undefined,
             accept_trade: acceptsTrade,
             payment_methods: selectedPaymentOptions
         }
-        return filterParameters;
+
+        const isFilterActive = filterParameters.is_new !== undefined || filterParameters.accept_trade !== undefined || filterParameters.payment_methods.length > 0;
+
+        return isFilterActive ? filterParameters : undefined;
     }
 
     const handleSetFilter = () => {
         const filterParameters = assembleFilterObject();
-        setFilterObject(filterParameters);
+
+        if (filterParameters) {
+            setFilterObject(filterParameters);
+            toast.show({
+                title: 'Detalhes do filtro foram armazenadas, clique na lupa para buscar itens que atendam aos critérios selecionados.',
+                bgColor: 'green.100',
+                placement: 'top'
+            })
+        }
 
         setIsModalOpen(false);
     }
